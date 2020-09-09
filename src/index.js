@@ -90,6 +90,7 @@ function getSongInfo() {
 
                         console.log(p.mainWindowTitle);
                         getMusixmatchLyricUrl(currentSong);
+                        setLyrics("", "Loading...")
                     }
 
                 }
