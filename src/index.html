@@ -32,6 +32,14 @@
 
 
 <script>
+
+    window.onkeydown = function (e) {
+        if (e.keyCode == 32 && e.target == document.body) {
+            e.preventDefault();
+            return false;
+        }
+    };
+
     const ipcRenderer = require('electron').ipcRenderer;
 
     const closeButtonEvent = document.getElementById('close-btn');
@@ -54,8 +62,8 @@
         document.getElementById("lyrics").innerHTML = lyricsText;
         document.getElementById("lyrics").scrollIntoView();
 
-        if (artworkUrl != "none"){
-            document.getElementById("artowrkimg").src = artworkUrl; 
+        if (artworkUrl != "none") {
+            document.getElementById("artowrkimg").src = artworkUrl;
         } else {
             document.getElementById("artowrkimg").src = "./images/artwork.png";
         }
