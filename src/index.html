@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+    <div class="draggable" id="titlebar">
+
+        <button id="min-btn" class="menu-btn">–</button>
+        <button id="close-btn" class="menu-btn">🞩</button>
+
+    </div>
+
+    <div id="songinfo">
+        <!--Artwork icon: Music by Trident from the Noun Project-->
+        <img id="artowrkimg" src="./images/artwork.png" />
+        <div id="songtitle">
+
+        </div>
+    </div>
+
+    <div id="lyricsbox">
+        <div id="lyrics">
+            Tidal is paused.
+        </div>
+
+    </div>
+</body>
+
+
+<script>
+    const ipcRenderer = require('electron').ipcRenderer;
+
+    const closeButtonEvent = document.getElementById('close-btn');
+    closeButtonEvent.addEventListener('click', function () {
+        ipcRenderer.send("closeButtonEvent");
+    });
+
+
+    const minButtonEvent = document.getElementById('min-btn');
+    minButtonEvent.addEventListener('click', function () {
+        ipcRenderer.send("minButtonEvent");
+    });
+
+    ipcRenderer.on('setLyrics', (event, arg) => {
+        var values = arg.split('%%');
+        var songName = values[0];
+        var lyricsText = values[1];
+        var artworkUrl = values[2];
+        document.getElementById("songtitle").innerHTML = songName;
+        document.getElementById("lyrics").innerHTML = lyricsText
+
+        if (artworkUrl != "none"){
+            document.getElementById("artowrkimg").src = artworkUrl; 
+        } else {
+            document.getElementById("artowrkimg").src = "./images/artwork.png";
+        }
+
+    })
+</script>
+
+</html>
