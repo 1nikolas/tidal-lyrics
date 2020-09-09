@@ -51,7 +51,8 @@
         var lyricsText = values[1];
         var artworkUrl = values[2];
         document.getElementById("songtitle").innerHTML = songName;
-        document.getElementById("lyrics").innerHTML = lyricsText
+        document.getElementById("lyrics").innerHTML = lyricsText;
+        document.getElementById("lyrics").scrollIntoView();
 
         if (artworkUrl != "none"){
             document.getElementById("artowrkimg").src = artworkUrl; 
