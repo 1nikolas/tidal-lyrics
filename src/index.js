@@ -94,7 +94,7 @@ function getSongInfo() {
                         currentSong = p.mainWindowTitle;
 
                         console.log(p.mainWindowTitle);
-                        getMusixmatchLyricUrl(currentSong);
+                        getMusixmatchLyricUrl(currentSong.replace("?", "*"));
                         setLyrics("", "Loading...")
                     }
 
@@ -115,12 +115,12 @@ function getMusixmatchLyricUrl(songName) {
             if (error != null) {
                 //error
                 console.log('getMusixmatchLyricUrl error')
-                setLyrics(songName, "Error.")
+                setLyrics("", "Error.")
 
             } else if (!body.includes("Best Result")) {
                 //track not found on musixmatch
                 console.log('track not found on musixmatch')
-                setLyrics(songName, "Track not found on Musixmatch.")
+                setLyrics("", "Track not found on Musixmatch.")
             } else {
 
                 var lyricsUrl = body.substring(
@@ -143,12 +143,19 @@ function getMusixmatchLyrics(songName, lyricUrl) {
             if (error != null) {
                 //error
                 console.log('getMusixmatchLyrics error');
-                setLyrics(songName, "Error.")
+                setLyrics("", "Error.")
             } else if (body.includes('Lyrics not available')) {
                 //lyrics not available on Musixmatch
                 console.log('lyrics not available on Musixmatch');
-                setLyrics(songName, "Lyrics not available on Musixmatch.");
+                setLyrics("", "Lyrics not available on Musixmatch.");
             } else {
+
+                var musixmatchTitle = body.substring(
+                    body.indexOf('<title data-react-helmet="true">') + 32,
+                    body.indexOf('Lyrics | Musixmatch</title>')
+                )
+
+                console.log(musixmatchTitle)
 
                 var lyrics = "";
 
@@ -182,7 +189,7 @@ function getMusixmatchLyrics(songName, lyricUrl) {
                 console.log(coverUrl);
                 console.log(lyrics);
 
-                setLyrics(songName, lyrics, coverUrl, lyricUrl)
+                setLyrics(musixmatchTitle, lyrics, coverUrl, lyricUrl)
 
 
             }
