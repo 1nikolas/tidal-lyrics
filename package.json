@@ -1,8 +1,8 @@
 {
   "name": "tidal-lyrics",
   "productName": "tidal-lyrics",
-  "version": "1.0.0",
-  "description": "My Electron application description",
+  "version": "1.1.0",
+  "description": " Get the lyrics of what you're listening on Tidal",
   "main": "src/index.js",
   "scripts": {
     "start": "electron-forge start",

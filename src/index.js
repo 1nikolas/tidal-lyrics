@@ -165,7 +165,7 @@ function getMusixmatchLyrics(songName, lyricUrl) {
 
                 }
 
-                lyrics = lyrics.replaceAll("\\n", "<br />");
+                lyrics = lyrics.replaceAll("\\n", "<br />").replaceAll("\\", "");
 
                 var coverUrl = body.substring(
                     body.indexOf('"albumCoverart100x100":"') + 24,
