@@ -4,6 +4,9 @@ Only Musixmatch is supported as a source for the time being.
 
 ![screenshot](https://user-images.githubusercontent.com/30593419/92543981-78242c80-f255-11ea-807d-c04848af30e8.png)
 
+## Download
+Download the latest version from the [releases](https://github.com/1nikolas/tidal-lyrics/releases).
+
 ## TODO
 - Add an icon
 - Make the app look more beautiful (maybe add some gradient background effect?)
