@@ -17,8 +17,13 @@
     <div id="songinfo">
         <!--Artwork icon: Music by Trident from the Noun Project-->
         <img id="artowrkimg" src="./images/artwork.png" />
-        <div id="songtitle">
+        <div id="infotext">
+            <div id="songtitle">
 
+            </div>
+            <div id="sourcetext">
+                Source: <a id="musixmatchLink" href="https://musixmatch.com/" target="_blank">Musixmatch</a>
+            </div>
         </div>
     </div>
 
@@ -58,6 +63,7 @@
         var songName = values[0];
         var lyricsText = values[1];
         var artworkUrl = values[2];
+        var lyricsUrl = values[3];
         document.getElementById("songtitle").innerHTML = songName;
         document.getElementById("lyrics").innerHTML = lyricsText;
         document.getElementById("lyrics").scrollIntoView();
@@ -68,49 +74,59 @@
             document.getElementById("artowrkimg").src = "./images/artwork.png";
         }
 
+        if (lyricsUrl != "none") {
+            document.getElementById("musixmatchLink").href = lyricsUrl;
+            document.getElementById("sourcetext").style.visibility  = "visible";
+            console.log("unhidden")
+        } else {
+            //document.getElementById("musixmatchLink").href = "https://musixmatch.com/";
+            document.getElementById("sourcetext").style.visibility  = "hidden";
+            console.log("hidden")
+        }
+
     })
 
     //From https://github.com/phuoc-ng/html-dom/blob/master/demo/drag-to-scroll/index.html
-    document.addEventListener('DOMContentLoaded', function() {
-    const ele = document.getElementById('lyricsbox');
+    document.addEventListener('DOMContentLoaded', function () {
+        const ele = document.getElementById('lyricsbox');
 
-    let pos = { top: 0, left: 0, x: 0, y: 0 };
+        let pos = { top: 0, left: 0, x: 0, y: 0 };
 
-    const mouseDownHandler = function(e) {
-        ele.style.userSelect = 'none';
+        const mouseDownHandler = function (e) {
+            ele.style.userSelect = 'none';
 
-        pos = {
-            left: ele.scrollLeft,
-            top: ele.scrollTop,
-            // Get the current mouse position
-            x: e.clientX,
-            y: e.clientY,
+            pos = {
+                left: ele.scrollLeft,
+                top: ele.scrollTop,
+                // Get the current mouse position
+                x: e.clientX,
+                y: e.clientY,
+            };
+
+            document.addEventListener('mousemove', mouseMoveHandler);
+            document.addEventListener('mouseup', mouseUpHandler);
         };
 
-        document.addEventListener('mousemove', mouseMoveHandler);
-        document.addEventListener('mouseup', mouseUpHandler);
-    };
+        const mouseMoveHandler = function (e) {
+            // How far the mouse has been moved
+            const dx = e.clientX - pos.x;
+            const dy = e.clientY - pos.y;
 
-    const mouseMoveHandler = function(e) {
-        // How far the mouse has been moved
-        const dx = e.clientX - pos.x;
-        const dy = e.clientY - pos.y;
+            // Scroll the element
+            ele.scrollTop = pos.top - dy;
+            ele.scrollLeft = pos.left - dx;
+        };
 
-        // Scroll the element
-        ele.scrollTop = pos.top - dy;
-        ele.scrollLeft = pos.left - dx;
-    };
+        const mouseUpHandler = function () {
+            ele.style.removeProperty('user-select');
 
-    const mouseUpHandler = function() {
-        ele.style.removeProperty('user-select');
+            document.removeEventListener('mousemove', mouseMoveHandler);
+            document.removeEventListener('mouseup', mouseUpHandler);
+        };
 
-        document.removeEventListener('mousemove', mouseMoveHandler);
-        document.removeEventListener('mouseup', mouseUpHandler);
-    };
-
-    // Attach the handler
-    ele.addEventListener('mousedown', mouseDownHandler);
-});
+        // Attach the handler
+        ele.addEventListener('mousedown', mouseDownHandler);
+    });
 </script>
 
 </html>

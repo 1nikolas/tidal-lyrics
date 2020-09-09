@@ -30,6 +30,11 @@ const createWindow = () => {
     //mainWindow.webContents.openDevTools();
     Menu.setApplicationMenu(null)
 
+    mainWindow.webContents.on('new-window', function(e, url) {
+        e.preventDefault();
+        require('electron').shell.openExternal(url);
+      });
+
     setInterval(function () {
         getSongInfo();
     }, 1000)
@@ -84,7 +89,7 @@ function getSongInfo() {
                     if (p.mainWindowTitle == "TIDAL") {
                         currentSong = p.mainWindowTitle;
                         console.log("paused")
-                        setLyrics("", "Tidal is paused")
+                        setLyrics("", "Tidal is paused.")
                     } else {
                         currentSong = p.mainWindowTitle;
 
@@ -177,7 +182,7 @@ function getMusixmatchLyrics(songName, lyricUrl) {
                 console.log(coverUrl);
                 console.log(lyrics);
 
-                setLyrics(songName, lyrics, coverUrl)
+                setLyrics(songName, lyrics, coverUrl, lyricUrl)
 
 
             }
@@ -185,9 +190,9 @@ function getMusixmatchLyrics(songName, lyricUrl) {
 
 }
 
-function setLyrics(songName, lyrics, coverUrl = "none") {
+function setLyrics(songName, lyrics, coverUrl = "none", lyricsUrl = "none") {
     const window = require('electron-main-window').getMainWindow();
 
-    window.webContents.send('setLyrics', songName + "%%" + lyrics + "%%" + coverUrl)
+    window.webContents.send('setLyrics', songName + "%%" + lyrics + "%%" + coverUrl + "%%" + lyricsUrl)
 }
 

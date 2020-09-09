@@ -72,14 +72,39 @@ body {
     margin-right: 20px;
 }
 
+#infotext {
+    margin-left:auto;
+    margin-right:0; 
+    display: grid;
+}
+
 #songtitle {
     color: white;
     font-size: large;
     text-align: right;
-    margin-left:auto;
-    margin-right:0; 
     font-family: Arial, Helvetica, sans-serif;
 
+}
+
+#sourcetext {
+    text-align: right;
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+    font-size: small;
+    align-self: end;
+    margin-bottom: 15px;
+    visibility: hidden;
+}
+
+#musixmatchLink {
+    color: orange;
+    text-decoration: none;
+
+}
+
+#musixmatchLink:visited {
+    color: orange;
+    text-decoration: none;
 }
 
 #lyricsbox {
