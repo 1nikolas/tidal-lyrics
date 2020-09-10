@@ -3,7 +3,7 @@ Simple app to get the lyrics of what you're listening on Tidal. Built with Elect
 
 *Only Musixmatch is supported as a source for the time being.*
 
-![TIDAL_HMlTlIZJhT](https://user-images.githubusercontent.com/30593419/92633203-1b6b5500-f2db-11ea-9061-271d219d8db7.png)
+![TIDAL_Tn5WYTMaYw](https://user-images.githubusercontent.com/30593419/92815093-92cce180-f3cc-11ea-8960-76bf60fd9f34.png)
 
 ## Download
 Download the latest version from the [releases](https://github.com/1nikolas/tidal-lyrics/releases).
