@@ -163,7 +163,12 @@ function getMusixmatchLyrics(songName, lyricUrl) {
 
                 console.log(coverUrl);
 
-                setLyrics(musixmatchTitle, "Lyrics not available on Musixmatch.", coverUrl, lyricUrl);
+                if (!coverUrl.includes('nocover')){
+                    setLyrics(musixmatchTitle, "Lyrics not available on Musixmatch.", coverUrl, lyricUrl);
+                } else {
+                    setLyrics(musixmatchTitle, "Lyrics not available on Musixmatch.", "none", lyricUrl);
+                }
+
             } else {
 
                 var musixmatchTitle = body.substring(
@@ -205,7 +210,11 @@ function getMusixmatchLyrics(songName, lyricUrl) {
                 console.log(coverUrl);
                 console.log(lyrics);
 
-                setLyrics(musixmatchTitle, lyrics, coverUrl, lyricUrl)
+                if (!coverUrl.includes('nocover')){
+                    setLyrics(musixmatchTitle, lyrics, coverUrl, lyricUrl)
+                } else {
+                    setLyrics(musixmatchTitle, lyrics, "none", lyricUrl)
+                }
 
 
             }
