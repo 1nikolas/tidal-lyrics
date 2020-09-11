@@ -13,9 +13,11 @@ Found a problem or want to suggest something? [Open an issue](https://github.com
 
 ## TODO
 - Add an icon
-- Make the app look more beautiful (maybe add some gradient background effect?)
+- Add a refresh button (if something messes up)
+- Make the app look better
+- Make the app not look empty when Tidal is paused
 - Add some font
-- Support more lyric sources
+- Support more lyric sources and add options menu
 
 ## Credits
 - This app uses lyrics from [Musixmatch](https://www.musixmatch.com/)
