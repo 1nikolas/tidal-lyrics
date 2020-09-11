@@ -8,6 +8,9 @@ Simple app to get the lyrics of what you're listening on Tidal. Built with Elect
 ## Download
 Download the latest version from the [releases](https://github.com/1nikolas/tidal-lyrics/releases).
 
+## Problems and Suggestions
+Have a problem or want to suggest something? [Open an issue](https://github.com/1nikolas/tidal-lyrics/issues)!
+
 ## TODO
 - Add an icon
 - Make the app look more beautiful (maybe add some gradient background effect?)
