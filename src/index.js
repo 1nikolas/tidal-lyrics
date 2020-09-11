@@ -94,7 +94,7 @@ function getSongInfo() {
                         currentSong = p.mainWindowTitle;
 
                         console.log(p.mainWindowTitle);
-                        getMusixmatchLyricUrl(currentSong.replace("?", "*"));
+                        getMusixmatchLyricUrl(currentSong.replaceAll("?", "*"));
                         setLyrics("", "Loading...")
                     }
 
@@ -112,6 +112,7 @@ function getSongInfo() {
 function getMusixmatchLyricUrl(songName) {
     request({ uri: "https://www.musixmatch.com/search/" + songName },
         function (error, response, body) {
+            console.log("https://www.musixmatch.com/search/" + songName)
             if (error != null) {
                 //error
                 console.log('getMusixmatchLyricUrl error')
