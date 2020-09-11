@@ -4,15 +4,14 @@ const path = require('path');
 var processWindows = require("node-process-windows");
 var request = require("request");
 var currentSong = "";
+var hasRetried = false;
 
 
-// Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
+if (require('electron-squirrel-startup')) {
     app.quit();
 }
 
 const createWindow = () => {
-    // Create the browser window.
     const mainWindow = new BrowserWindow({
         width: 380,
         height: 600,
@@ -23,17 +22,16 @@ const createWindow = () => {
         }
     });
 
-    // and load the index.html of the app.
     mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
-    // Open the DevTools.
     //mainWindow.webContents.openDevTools();
+
     Menu.setApplicationMenu(null)
 
-    mainWindow.webContents.on('new-window', function(e, url) {
+    mainWindow.webContents.on('new-window', function (e, url) {
         e.preventDefault();
         require('electron').shell.openExternal(url);
-      });
+    });
 
     setInterval(function () {
         getSongInfo();
@@ -41,23 +39,17 @@ const createWindow = () => {
 
 };
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
 app.on('ready', createWindow);
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
+// For MacOS
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
         app.quit();
     }
 });
 
+// For MacOS
 app.on('activate', () => {
-    // On OS X it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) {
         createWindow();
     }
@@ -66,7 +58,6 @@ app.on('activate', () => {
 
 ipcMain.on("closeButtonEvent", function (event) {
     app.quit();
-    //event.sender.send("btnclick-task-finished", "yes");
 });
 
 ipcMain.on("minButtonEvent", function (event) {
@@ -74,18 +65,17 @@ ipcMain.on("minButtonEvent", function (event) {
     event.sender.send("btnclick-task-finished", "yes");
 });
 
+
 function getSongInfo() {
 
-
-
     var activeProcesses = processWindows.getProcesses(function (err, processes) {
-        
+
         processes.forEach(function (p) {
             if (p.processName == "TIDAL" && p.mainWindowTitle != "" && p.mainWindowTitle != "Drag") {
 
-                
+
                 if (currentSong != p.mainWindowTitle) {
-                    
+
                     if (p.mainWindowTitle == "TIDAL") {
                         currentSong = p.mainWindowTitle;
                         console.log("paused")
@@ -94,7 +84,10 @@ function getSongInfo() {
                         currentSong = p.mainWindowTitle;
 
                         console.log(p.mainWindowTitle);
-                        getMusixmatchLyricUrl(currentSong.replaceAll("?", "*").replaceAll("/", "*"));
+                        //Replace ? with * is used because some symbols/characters don't get read correctly by node-process-windows
+                        //Replace / with * is used because Musixmatch doesn't like slashes in the search query
+                        //Replace " - " with "* - " is used because Tidal sometimes ommits parentheses in the end of a title when it outputs the window title to save up space
+                        searchMusixmatch(currentSong.replaceAll("?", "*").replaceAll("/", "*").replaceAll(' - ', '* - '));
                         setLyrics("", "Loading...")
                     }
 
@@ -109,19 +102,40 @@ function getSongInfo() {
 }
 
 
-function getMusixmatchLyricUrl(songName) {
-    request({ uri: "https://www.musixmatch.com/search/" + songName },
+function searchMusixmatch(searchQuery) {
+    request({ uri: "https://www.musixmatch.com/search/" + searchQuery },
         function (error, response, body) {
-            console.log("https://www.musixmatch.com/search/" + songName)
+            console.log("https://www.musixmatch.com/search/" + searchQuery)
             if (error != null) {
                 //error
-                console.log('getMusixmatchLyricUrl error')
+                console.log('searchMusixmatch error')
                 setLyrics("", "Error.")
 
             } else if (!body.includes("Best Result")) {
-                //track not found on musixmatch
-                console.log('track not found on musixmatch')
-                setLyrics("", "Track not found on Musixmatch.")
+
+                if (!hasRetried && searchQuery.includes(', ')) {
+
+                    //This is used to retry if it can't find a song due to being on Musixmatch as "Song (feat. ArtistB) - ArtistA" rather than "Song - ArtistA, ArtistB"
+                    //It basically keeps only the first artist
+
+                    hasRetried = true;
+
+                    var splitedQuery = searchQuery.split(' - ')
+                    var originalArtists = splitedQuery[splitedQuery.length - 1]
+                    var firstArtist = originalArtists.substring(0, originalArtists.indexOf(', '))
+
+                    var newSearchQuery = searchQuery.replace(originalArtists, firstArtist)
+
+                    searchMusixmatch(newSearchQuery)
+
+
+                } else {
+
+                    //track not found on musixmatch
+                    console.log('track not found on musixmatch')
+                    setLyrics("", "Track not found on Musixmatch.")
+
+                }
             } else {
 
                 var lyricsUrl = body.substring(
@@ -132,13 +146,13 @@ function getMusixmatchLyricUrl(songName) {
 
                 console.log(lyricsUrl);
 
-                getMusixmatchLyrics(songName, lyricsUrl);
+                getMusixmatchLyrics(searchQuery, lyricsUrl);
 
             }
         });
 }
 
-function getMusixmatchLyrics(songName, lyricUrl) {
+function getMusixmatchLyrics(searchQuery, lyricUrl) {
     request({ uri: lyricUrl },
         function (error, response, body) {
             if (error != null) {
@@ -146,6 +160,7 @@ function getMusixmatchLyrics(songName, lyricUrl) {
                 console.log('getMusixmatchLyrics error');
                 setLyrics("", "Error.")
             } else if (body.includes('Lyrics not available')) {
+
                 //lyrics not available on Musixmatch
                 console.log('lyrics not available on Musixmatch');
 
@@ -164,11 +179,13 @@ function getMusixmatchLyrics(songName, lyricUrl) {
 
                 console.log(coverUrl);
 
-                if (!coverUrl.includes('nocover')){
+                if (!coverUrl.includes('nocover')) {
                     setLyrics(musixmatchTitle, "Lyrics not available on Musixmatch.", coverUrl, lyricUrl);
                 } else {
                     setLyrics(musixmatchTitle, "Lyrics not available on Musixmatch.", "none", lyricUrl);
                 }
+
+
 
             } else {
 
@@ -183,15 +200,14 @@ function getMusixmatchLyrics(songName, lyricUrl) {
 
                 var count = (body.match(/"body":"/g) || []).length;
                 if (count == 2) {
-                    //lyrics are reviewed (no yello mark on website) so we need the first occurrence  of '"body":"'
+                    //When body":" appears 2 times it means there is only one version of the lyrics so we need the first occurrence  of '"body":"'
                     lyrics = body.substring(
                         body.indexOf(',"body":"') + 9,
                         body.lastIndexOf('","language":')
                     )
                 } else if (count == 3) {
-                    //lyrics are not reviewed (yellow mark on website) so we need the second occurrence  of '"body":"' (first one is some previewsly submited lyrics not visible on the website)
+                    //When body":" appears 3 times it means that there are 2 versions of the lyrics so we need the second occurrence  of '"body":"' (the one visible on the website)
                     var indexOfFirstBody = body.indexOf(',"body":"');
-                    //var indexOfFirstLanguage = body.indexOf('","language":')
 
                     lyrics = body.substring(
                         body.indexOf(',"body":"', (indexOfFirstBody + 1)) + 9,
@@ -211,7 +227,7 @@ function getMusixmatchLyrics(songName, lyricUrl) {
                 console.log(coverUrl);
                 console.log(lyrics);
 
-                if (!coverUrl.includes('nocover')){
+                if (!coverUrl.includes('nocover')) {
                     setLyrics(musixmatchTitle, lyrics, coverUrl, lyricUrl)
                 } else {
                     setLyrics(musixmatchTitle, lyrics, "none", lyricUrl)
@@ -223,9 +239,11 @@ function getMusixmatchLyrics(songName, lyricUrl) {
 
 }
 
-function setLyrics(songName, lyrics, coverUrl = "none", lyricsUrl = "none") {
+function setLyrics(searchQuery, lyrics, coverUrl = "none", lyricsUrl = "none") {
     const window = require('electron-main-window').getMainWindow();
 
-    window.webContents.send('setLyrics', songName + "%%" + lyrics + "%%" + coverUrl + "%%" + lyricsUrl)
+    hasRetried = false;
+
+    window.webContents.send('setLyrics', searchQuery + "%%" + lyrics + "%%" + coverUrl + "%%" + lyricsUrl)
 }
 
