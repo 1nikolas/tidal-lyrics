@@ -147,7 +147,23 @@ function getMusixmatchLyrics(songName, lyricUrl) {
             } else if (body.includes('Lyrics not available')) {
                 //lyrics not available on Musixmatch
                 console.log('lyrics not available on Musixmatch');
-                setLyrics("", "Lyrics not available on Musixmatch.");
+
+                var musixmatchTitle = body.substring(
+                    body.indexOf('<title data-react-helmet="true">') + 32,
+                    body.indexOf('Lyrics | Musixmatch</title>')
+                )
+
+                console.log(musixmatchTitle)
+
+                var coverUrl = body.substring(
+                    body.indexOf('"albumCoverart100x100":"') + 24,
+                    body.indexOf('","albumCoverart350x350"')
+                )
+                coverUrl = JSON.parse('"' + coverUrl + '"').replace('"', "");
+
+                console.log(coverUrl);
+
+                setLyrics(musixmatchTitle, "Lyrics not available on Musixmatch.", coverUrl, lyricUrl);
             } else {
 
                 var musixmatchTitle = body.substring(
