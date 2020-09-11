@@ -81,7 +81,7 @@ function getSongInfo() {
     var activeProcesses = processWindows.getProcesses(function (err, processes) {
         
         processes.forEach(function (p) {
-            if (p.processName == "TIDAL" && p.mainWindowTitle != "") {
+            if (p.processName == "TIDAL" && p.mainWindowTitle != "" && p.mainWindowTitle != "Drag") {
 
                 
                 if (currentSong != p.mainWindowTitle) {
