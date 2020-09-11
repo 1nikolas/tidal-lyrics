@@ -118,12 +118,12 @@ body {
     background: 
         linear-gradient(#242528 33%, rgba(36,37,40, 0)),
         linear-gradient(rgba(36,37,40, 0), #242528 66%) 0 100%,
-        radial-gradient(farthest-side at 50% 0, rgba(153,153,153, 0.5), rgba(0,0,0,0)),
-        radial-gradient(farthest-side at 50% 100%, rgba(153,153,153, 0.5), rgba(0,0,0,0)) 0 100%;
+        radial-gradient(farthest-side at 50% 0, rgba(179,179,179, 0.5), rgba(0,0,0,0)),
+        radial-gradient(farthest-side at 50% 100%, rgba(179,179,179, 0.5), rgba(0,0,0,0)) 0 100%;
     background-color: #242528;
     background-repeat: no-repeat;
     background-attachment: local, local, scroll, scroll;
-    background-size: 100% 54px, 100% 54px, 100% 18px, 100% 18px;
+    background-size: 100% 60px, 100% 60px, 100% 20px, 100% 20px;
 }
 
 #lyricsbox::-webkit-scrollbar {
