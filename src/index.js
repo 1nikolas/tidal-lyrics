@@ -94,7 +94,7 @@ function getSongInfo() {
                         currentSong = p.mainWindowTitle;
 
                         console.log(p.mainWindowTitle);
-                        getMusixmatchLyricUrl(currentSong.replaceAll("?", "*"));
+                        getMusixmatchLyricUrl(currentSong.replaceAll("?", "*").replaceAll("/", "*"));
                         setLyrics("", "Loading...")
                     }
 
