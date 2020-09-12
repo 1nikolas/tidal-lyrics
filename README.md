@@ -12,8 +12,8 @@ Download the latest version from the [releases](https://github.com/1nikolas/tida
 Found a problem or want to suggest something? [Open an issue](https://github.com/1nikolas/tidal-lyrics/issues)!
 
 ## TODO
-- Add an icon
-- Add a refresh button (if something messes up)
+- ~~Add an icon~~
+- ~~Add a refresh button (if something messes up)~~
 - Make the app look better
 - Make the app not look empty when Tidal is paused
 - Support MacOS
