@@ -29,15 +29,17 @@ const createWindow = () => {
     request({ uri: "https://raw.githubusercontent.com/1nikolas/tidal-lyrics/master/version.txt" },
         function (error, response, body) {
             if (error == null) {
-                if (body != app.getVersion()) {
+                if (body.replace(/(\r\n|\n|\r)/gm,"") != app.getVersion()) {
                     //update available
                     let options = {
                         buttons: ["Update"],
                         message: "An update is available!"
                     }
                     dialog.showMessageBox(options).then(box => {
-                        require('electron').shell.openExternal("https://github.com/1nikolas/tidal-lyrics/releases");
-                        app.quit();
+                        if (box,response == 0){
+                            require('electron').shell.openExternal("https://github.com/1nikolas/tidal-lyrics/releases");
+                            app.quit();
+                        }
                     })
 
                 }
