@@ -17,6 +17,7 @@ const createWindow = () => {
         height: 600,
         frame: false,
         resizable: false,
+        icon: __dirname + "./images/icon.png",
         webPreferences: {
             nodeIntegration: true,
         }
@@ -35,7 +36,8 @@ const createWindow = () => {
                     dialog.showMessageBox(mainWindow, {
                         type: "info",
                         buttons: ["Update"],
-                        message: "An update is available!"
+                        message: "An update is available!",
+                        cancelId: 1
                     }).then(result => {
                         if (result.response === 0) {
                             require('electron').shell.openExternal("https://github.com/1nikolas/tidal-lyrics/releases");
@@ -80,8 +82,7 @@ const createWindow = () => {
         dialog.showMessageBox(mainWindow, {
             buttons: ["OK", "Visit tidal-lyrics on Github"],
             message: "tidal-lyrics " + app.getVersion() + "\nMade by Nikolas Spiridakis",
-            //TODO add app icon
-            //icon: path.join(LOCAL_RESOURCES_ROOT, 'images/icon.png')
+            icon: path.join(__dirname + "./images/icon.png")
         }).then(result => {
             if (result.response === 1) {
                 require('electron').shell.openExternal("https://github.com/1nikolas/tidal-lyrics/");
