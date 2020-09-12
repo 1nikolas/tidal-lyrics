@@ -33,6 +33,11 @@
         </div>
 
     </div>
+
+    <div id="bottomArea">
+        <button id="refresh"><img id="refreshimg" src="./images/refresh.png"/></button>
+        <button id="about"><img id="aboutimg" src="./images/about.png"/></button>
+    </div>
 </body>
 
 
@@ -56,6 +61,16 @@
     const minButtonEvent = document.getElementById('min-btn');
     minButtonEvent.addEventListener('click', function () {
         ipcRenderer.send("minButtonEvent");
+    });
+
+    const refreshBtnEvent = document.getElementById('refresh');
+    refreshBtnEvent.addEventListener('click', function () {
+        ipcRenderer.send("refreshBtnEvent");
+    });
+
+    const aboutBtnEvent = document.getElementById('about');
+    aboutBtnEvent.addEventListener('click', function () {
+        ipcRenderer.send("aboutBtnEvent");
     });
 
     ipcRenderer.on('setLyrics', (event, arg) => {

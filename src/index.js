@@ -29,14 +29,15 @@ const createWindow = () => {
     request({ uri: "https://raw.githubusercontent.com/1nikolas/tidal-lyrics/master/version.txt" },
         function (error, response, body) {
             if (error == null) {
-                if (body.replace(/(\r\n|\n|\r)/gm,"") != app.getVersion()) {
+                if (body.replace(/(\r\n|\n|\r)/gm, "") != app.getVersion()) {
+
                     //update available
-                    let options = {
+                    dialog.showMessageBox(mainWindow, {
+                        type: "info",
                         buttons: ["Update"],
                         message: "An update is available!"
-                    }
-                    dialog.showMessageBox(options).then(box => {
-                        if (box,response == 0){
+                    }).then(result => {
+                        if (result.response === 0) {
                             require('electron').shell.openExternal("https://github.com/1nikolas/tidal-lyrics/releases");
                             app.quit();
                         }
@@ -47,7 +48,7 @@ const createWindow = () => {
         }
     )
 
-    //mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
 
     Menu.setApplicationMenu(null)
 
@@ -59,6 +60,36 @@ const createWindow = () => {
     setInterval(function () {
         getSongInfo();
     }, 1000)
+
+
+    ipcMain.on("closeButtonEvent", function (event) {
+        app.quit();
+    });
+
+    ipcMain.on("minButtonEvent", function (event) {
+        BrowserWindow.getFocusedWindow().minimize();
+        event.sender.send("btnclick-task-finished", "yes");
+    });
+
+    ipcMain.on("refreshBtnEvent", function (event) {
+        getSongInfo(true);
+    });
+
+    ipcMain.on("aboutBtnEvent", function (event) {
+
+        dialog.showMessageBox(mainWindow, {
+            buttons: ["OK", "Visit tidal-lyrics on Github"],
+            message: "tidal-lyrics " + app.getVersion() + "\nMade by Nikolas Spiridakis",
+            //TODO add app icon
+            //icon: path.join(LOCAL_RESOURCES_ROOT, 'images/icon.png')
+        }).then(result => {
+            if (result.response === 1) {
+                require('electron').shell.openExternal("https://github.com/1nikolas/tidal-lyrics/");
+            }
+        })
+
+    });
+
 
 };
 
@@ -79,17 +110,10 @@ app.on('activate', () => {
 });
 
 
-ipcMain.on("closeButtonEvent", function (event) {
-    app.quit();
-});
-
-ipcMain.on("minButtonEvent", function (event) {
-    BrowserWindow.getFocusedWindow().minimize();
-    event.sender.send("btnclick-task-finished", "yes");
-});
 
 
-function getSongInfo() {
+
+function getSongInfo(force = false) {
 
     var activeProcesses = processWindows.getProcesses(function (err, processes) {
 
@@ -97,7 +121,7 @@ function getSongInfo() {
             if (p.processName == "TIDAL" && p.mainWindowTitle != "" && p.mainWindowTitle != "Drag") {
 
 
-                if (currentSong != p.mainWindowTitle) {
+                if (currentSong != p.mainWindowTitle || force) {
 
                     if (p.mainWindowTitle == "TIDAL") {
                         currentSong = p.mainWindowTitle;

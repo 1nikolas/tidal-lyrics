@@ -111,6 +111,7 @@ body {
     width: auto;
     height: calc(100% - 125px);
     margin: 15px;
+    margin-bottom: 0;
     overflow: auto;
 
     /* Generated from https://css-scroll-shadows.now.sh/ */
@@ -141,4 +142,30 @@ body {
     display: grid;
     place-items: center;
 
+}
+
+#bottomArea {
+    display: flex;
+    justify-content: flex-end;
+}
+
+#refresh, #about{
+    cursor: pointer;
+    outline: none;
+    display: inline-block;
+    border: none;
+    text-align: center;
+    text-decoration: none;
+    background-color: transparent;
+    color: white;
+}
+
+#refresh:hover, #about:hover {
+    background-color: #404040;
+}
+
+#refreshimg, #aboutimg {
+    height: 20px;
+    width: auto;
+    padding-top: 3px;
 }
