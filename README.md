@@ -16,6 +16,7 @@ Found a problem or want to suggest something? [Open an issue](https://github.com
 ## TODO
 - ~~Add an icon~~
 - ~~Add a refresh button (if something messes up)~~
+- Always on top option
 - Make the app look better
 - Make the app not look empty when Tidal is paused
 - Support MacOS
