@@ -17,7 +17,7 @@ const createWindow = () => {
         height: 600,
         frame: false,
         resizable: false,
-        icon: __dirname + "./images/icon.png",
+        icon: __dirname + '/images/icon.png',
         webPreferences: {
             nodeIntegration: true,
         }
@@ -50,7 +50,7 @@ const createWindow = () => {
         }
     )
 
-    mainWindow.webContents.openDevTools();
+    //mainWindow.webContents.openDevTools();
 
     Menu.setApplicationMenu(null)
 
