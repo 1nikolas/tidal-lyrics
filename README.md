@@ -1,4 +1,6 @@
 # tidal-lyrics
+![icon](https://raw.githubusercontent.com/1nikolas/tidal-lyrics/master/src/images/icon.png)
+
 Simple app to get the lyrics of what you're listening on Tidal. Built with Electron.
 
 *Only Musixmatch is supported as a source for the time being.*
