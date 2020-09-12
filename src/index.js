@@ -182,7 +182,7 @@ function getMusixmatchLyrics(searchQuery, lyricUrl) {
                 //error
                 console.log('getMusixmatchLyrics error');
                 setLyrics("", "Error.")
-            } else if (body.includes('Lyrics not available')) {
+            } else if (body.includes('Lyrics not available') || body.includes("Unfortunately we're not authorized to show these lyrics")) {
 
                 //lyrics not available on Musixmatch
                 console.log('lyrics not available on Musixmatch');
