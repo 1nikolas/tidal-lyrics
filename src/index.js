@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, ipcMain } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain, dialog } = require('electron');
 const remote = require("electron").remote;
 const path = require('path');
 var processWindows = require("node-process-windows");
@@ -23,6 +23,27 @@ const createWindow = () => {
     });
 
     mainWindow.loadFile(path.join(__dirname, 'index.html'));
+
+    console.log(app.getVersion())
+
+    request({ uri: "https://raw.githubusercontent.com/1nikolas/tidal-lyrics/master/version.txt" },
+        function (error, response, body) {
+            if (error == null) {
+                if (body != app.getVersion()) {
+                    //update available
+                    let options = {
+                        buttons: ["Update"],
+                        message: "An update is available!"
+                    }
+                    dialog.showMessageBox(options).then(box => {
+                        require('electron').shell.openExternal("https://github.com/1nikolas/tidal-lyrics/releases");
+                        app.quit();
+                    })
+
+                }
+            }
+        }
+    )
 
     //mainWindow.webContents.openDevTools();
 
