@@ -35,10 +35,11 @@
           }
         },
         {
-          "name": "@electron-forge/maker-zip",
-          "platforms": [
-            "darwin"
-          ]
+          "name": "@electron-forge/maker-dmg",
+          "config": {
+            "background": "./assets/dmg-background.png",
+            "format": "ULFO"
+          }
         },
         {
           "name": "@electron-forge/maker-deb",
@@ -49,9 +50,10 @@
           "config": {}
         }
       ]
-    }
-  },
+  }
+},
   "dependencies": {
+    "@electron-forge/maker-dmg": "^6.0.0-beta.53",
     "electron-main-window": "^1.0.4",
     "electron-squirrel-startup": "^1.0.0",
     "node-process-windows": "0.0.2",
@@ -64,6 +66,8 @@
     "@electron-forge/maker-squirrel": "^6.0.0-beta.53",
     "@electron-forge/maker-zip": "^6.0.0-beta.53",
     "electron": "10.1.1",
-    "electron-rebuild": "^2.0.2"
+    "electron-rebuild": "^2.0.2",
+    "electron-prebuilt-compile": "8.2.0"
   }
 }
+
