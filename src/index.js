@@ -15,8 +15,12 @@ const createWindow = () => {
     const mainWindow = new BrowserWindow({
         width: 380,
         height: 600,
+        minWidth: 380,
+        minHeight: 600,
+        maxWidth: 380,
+        maxHeight: 600,
         frame: false,
-        resizable: false,
+        resizable: true,
         icon: __dirname + '/images/icon.png',
         webPreferences: {
             nodeIntegration: true,
