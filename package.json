@@ -5,7 +5,10 @@
   "description": " Get the lyrics of what you're listening on Tidal",
   "main": "src/index.js",
   "win": {
-    "icon": "./icon.ico"
+    "icon": "./src/images/icon.ico"
+  },
+  "mac": {
+    "icon": "./src/images/icon.icns"
   },
   "scripts": {
     "start": "electron-forge start",
@@ -24,14 +27,14 @@
   "config": {
     "forge": {
       "packagerConfig": {
-        "icon": "icon.ico"
+        "icon": "./src/images/icon.icns"
       },
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
             "name": "tidal_lyrics",
-            "iconUrl": "https://raw.githubusercontent.com/1nikolas/tidal-lyrics/master/icon.ico"
+            "iconUrl": "https://raw.githubusercontent.com/1nikolas/tidal-lyrics/master/src/images/icon.ico"
           }
         },
         {

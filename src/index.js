@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain, dialog, nativeImage } = require('electron');
 const remote = require("electron").remote;
 const path = require('path');
 const { exec } = require("child_process");
@@ -44,15 +44,24 @@ const createWindow = () => {
                 if (body.replace(/(\r\n|\n|\r)/gm, "") != app.getVersion()) {
 
                     //update available
+                    var dialogIcon = null
+                    if (process.platform == "darwin"){
+                        dialogIcon = __dirname + "/images/icon.png"
+                    }
                     dialog.showMessageBox(mainWindow, {
                         type: "info",
-                        buttons: ["Update"],
+                        buttons: ["Update", "Dismiss"],
                         message: "An update is available!",
+                        icon: dialogIcon,
                         cancelId: 1
                     }).then(result => {
                         if (result.response === 0) {
                             require('electron').shell.openExternal("https://github.com/1nikolas/tidal-lyrics/releases");
-                            app.quit();
+                            if (process.platform == "win32"){
+                                app.quit()
+                            } else if (process.platform == "darwin"){
+                                setTimeout(app.quit(), 1000);
+                            }
                         }
                     })
 
@@ -93,7 +102,7 @@ const createWindow = () => {
         dialog.showMessageBox(mainWindow, {
             buttons: ["OK", "Visit tidal-lyrics on Github"],
             message: "tidal-lyrics " + app.getVersion() + "\nMade by Nikolas Spiridakis",
-            icon: path.join(__dirname + "./images/icon.png")
+            icon: __dirname + "/images/icon.png"
         }).then(result => {
             if (result.response === 1) {
                 require('electron').shell.openExternal("https://github.com/1nikolas/tidal-lyrics/");
@@ -105,6 +114,10 @@ const createWindow = () => {
 
 
 };
+
+if (process.platform == "darwin"){
+    app.dock.setIcon(nativeImage.createFromPath(__dirname + "/images/icon.png"));
+}
 
 app.on('ready', createWindow);
 
