@@ -119,30 +119,30 @@ app.on('activate', () => {
 
 
 function getSongInfo(force = false) {
-  
-if (process.platform == "win32"){
-    getSongInfoWin(force)
-} else if (process.platform == "darwin"){
-    getSongInfoMac(force)
-}
+
+    if (process.platform == "win32") {
+        getSongInfoWin(force)
+    } else if (process.platform == "darwin") {
+        getSongInfoMac(force)
+    }
 
 }
 
-function getSongInfoWin(force){
+function getSongInfoWin(force) {
 
     exec("powershell -ExecutionPolicy Bypass -File " + __dirname + "\\scripts\\windows.ps1", (error, stdout, stderr) => {
-        
+
         var commandOut = stdout.trim()
 
-        if (currentSong != commandOut || force){
+        if (currentSong != commandOut || force) {
 
             currentSong = commandOut;
 
-            if (commandOut == ""){
+            if (commandOut == "") {
                 //tidal not running
                 console.log("not running")
                 setLyrics("", "Tidal is not running.")
-            } else if (commandOut == "TIDAL"){
+            } else if (commandOut == "TIDAL") {
                 //tidal is paused
                 console.log("paused")
                 setLyrics("", "Tidal is paused.")
@@ -158,18 +158,65 @@ function getSongInfoWin(force){
                 searchMusixmatch(searchQuery)
             } else {
                 //script failed (probably)
-                console.log(commandOut)
+                console.log("Error:<br>" + commandOut)
                 setLyrics("", "Error<br>" + commandOut)
 
             }
         }
-        
+
     });
 
 
 }
 
-function getSongInfoMac(force){
+function getSongInfoMac(force) {
+
+
+    exec("osascript " + __dirname + "/scripts/macos.scpt", (error, stdout, stderr) => {
+
+        
+        if (stderr != "") {
+            if (stderr.includes("Not authorised to send Apple events to System Events") && (currentSong != "noEventsPerm" || force)) {
+                //System Events.App permission not granted
+                currentSong = "noEventsPerm"
+                console.log("System Events.App permission not granted")
+                setLyrics("", 'Please grant System Events.App permission<br><br>If the permission dialog didn\'t come up you have to grant it manually:<br>1. Go to Settings<br>2. Security & Privacy<br>3. Go to Privacy Tab<br>4. Choose Automation<br>5. Under tidal-lyrics tick "System Events.App"<br><br>(Blame Apple for all this)')
+            } else if (stderr.includes("osascript is not allowed assistive access") && (currentSong != "noAccesibilityPerm" || force)) {
+                //Accecibility permission not granted
+                currentSong = "noAccesibilityPerm"
+                console.log("Accecibility permission not granted")
+                setLyrics("", 'Please grant Accecibility permission<br><br>If the permission dialog didn\'t come up you have to grant it manually:<br>1. Go to Settings<br>2. Security & Privacy<br>3. Go to Privacy Tab<br>4. Choose Accecibility<br>5. Tick tidal-lyrics<br><br>(Blame Apple for all this)')
+            } else if ((stderr.includes("Can’t get process") || stderr.includes("Can’t get window 1 of process")) && (currentSong != "notRunning" || force)) {
+                //Tidal not running
+                currentSong = "notRunning"
+                console.log("Tidal not running")
+                setLyrics("", "Tidal is not running.")
+            } else if (currentSong != "noEventsPerm" && currentSong != "noAccesibilityPerm" && currentSong != "notRunning" && currentSong != "unknownErr") {
+                //Unknown error (script failed?)
+                currentSong = "unknownErr"
+                console.log("Error: " + stderr)
+                setLyrics("", "Error:<br>" + stderr)
+            }
+        } else if (stdout == "TIDAL" && (currentSong != "TIDAL" || force)) {
+            //Tidal is paused
+            currentSong = "TIDAL"
+            console.log("Paused")
+            setLyrics("", "Tidal is paused.")
+        } else if (stdout.includes(" - ") && (currentSong != stdout || force)) {
+            //Tidal is playing
+            currentSong = stdout
+            console.log(stdout)
+            /*
+            Replace / with * is used because Musixmatch doesn't like slashes in the search query
+            Replace " - " with "* - " is used because Tidal sometimes ommits parentheses in the end of a title when it outputs the window title to save up space
+            */
+            searchQuery = currentSong.replace(" - ", "* - ").replace("/", "*")
+            setLyrics("", "Loading...")
+            //searchMusixmatch(searchQuery)
+        }
+
+
+    });
 
 }
 
