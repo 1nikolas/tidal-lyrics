@@ -5,6 +5,7 @@ const { exec } = require("child_process");
 var request = require("request");
 var currentSong = "---";
 var hasRetried = false;
+var isCommandRunning = false;
 
 
 if (require('electron-squirrel-startup')) {
@@ -28,6 +29,12 @@ const createWindow = () => {
     });
 
     mainWindow.loadFile(path.join(__dirname, 'index.html'));
+
+    mainWindow.webContents.on('did-finish-load', function () {
+        if (process.platform == "darwin") {
+            mainWindow.webContents.send('setMacCloseSymbol')
+        }
+    })
 
     console.log(app.getVersion())
 
@@ -96,6 +103,7 @@ const createWindow = () => {
     });
 
 
+
 };
 
 app.on('ready', createWindow);
@@ -116,21 +124,26 @@ app.on('activate', () => {
 
 
 
-
-
 function getSongInfo(force = false) {
 
-    if (process.platform == "win32") {
-        getSongInfoWin(force)
-    } else if (process.platform == "darwin") {
-        getSongInfoMac(force)
+    if (!isCommandRunning) {
+        if (process.platform == "win32") {
+            getSongInfoWin(force)
+        } else if (process.platform == "darwin") {
+            getSongInfoMac(force)
+        }
     }
+
 
 }
 
 function getSongInfoWin(force) {
 
+    isCommandRunning = true
+
     exec("powershell -ExecutionPolicy Bypass -File " + __dirname + "\\scripts\\windows.ps1", (error, stdout, stderr) => {
+
+        isCommandRunning = false
 
         var commandOut = stdout.trim()
 
@@ -149,17 +162,17 @@ function getSongInfoWin(force) {
             } else if (commandOut.includes(" - ")) {
                 //tidal is playing music
                 console.log(commandOut)
-                /*
-                Replace / with * is used because Musixmatch doesn't like slashes in the search query
-                Replace " - " with "* - " is used because Tidal sometimes ommits parentheses in the end of a title when it outputs the window title to save up space
-                */
+
+                //Replace / with * is used because Musixmatch doesn't like slashes in the search query
+                //Replace " - " with "* - " is used because Tidal sometimes ommits parentheses in the end of a title when it outputs the window title to save up space
+
                 searchQuery = commandOut.replace(" - ", "* - ").replace("/", "*")
                 setLyrics("", "Loading...")
                 searchMusixmatch(searchQuery)
-            } else {
+            } else if (commandOut != "Drag") {
                 //script failed (probably)
-                console.log("Error:<br>" + commandOut)
-                setLyrics("", "Error<br>" + commandOut)
+                console.log("Error: " + commandOut)
+                setLyrics("", "Error:<br>" + commandOut)
 
             }
         }
@@ -171,52 +184,59 @@ function getSongInfoWin(force) {
 
 function getSongInfoMac(force) {
 
+    isCommandRunning = true
 
-    exec("osascript " + __dirname + "/scripts/macos.scpt", (error, stdout, stderr) => {
+    exec("/bin/bash " + __dirname + "/scripts/macos.sh " + __dirname + "/scripts/macos.scpt", (error, stdout, stderr) => {
 
-        
-        if (stderr != "") {
-            if (stderr.includes("Not authorised to send Apple events to System Events") && (currentSong != "noEventsPerm" || force)) {
+        isCommandRunning = false
+
+        var commandOut = stdout.trim()
+
+        if (commandOut != currentSong || force) {
+            currentSong = commandOut
+
+            if (commandOut == "noEventsPerm") {
                 //System Events.App permission not granted
                 currentSong = "noEventsPerm"
                 console.log("System Events.App permission not granted")
                 setLyrics("", 'Please grant System Events.App permission<br><br>If the permission dialog didn\'t come up you have to grant it manually:<br>1. Go to Settings<br>2. Security & Privacy<br>3. Go to Privacy Tab<br>4. Choose Automation<br>5. Under tidal-lyrics tick "System Events.App"<br><br>(Blame Apple for all this)')
-            } else if (stderr.includes("osascript is not allowed assistive access") && (currentSong != "noAccesibilityPerm" || force)) {
-                //Accecibility permission not granted
-                currentSong = "noAccesibilityPerm"
-                console.log("Accecibility permission not granted")
-                setLyrics("", 'Please grant Accecibility permission<br><br>If the permission dialog didn\'t come up you have to grant it manually:<br>1. Go to Settings<br>2. Security & Privacy<br>3. Go to Privacy Tab<br>4. Choose Accecibility<br>5. Tick tidal-lyrics<br><br>(Blame Apple for all this)')
-            } else if ((stderr.includes("Can’t get process") || stderr.includes("Can’t get window 1 of process")) && (currentSong != "notRunning" || force)) {
+            } else if (commandOut == "noAccessibilityPerm") {
+                //Accessibility permission not granted
+                currentSong = "noAccessibilityPerm"
+                console.log("Accessibility permission not granted")
+                setLyrics("", 'Please grant Accessibility permission<br><br>If the permission dialog didn\'t come up you have to grant it manually:<br>1. Go to Settings<br>2. Security & Privacy<br>3. Go to Privacy Tab<br>4. Choose Accecibility<br>5. Click the lock icon on the bottom left and enter your password<br>6. Tick tidal-lyrics<br><br>(Blame Apple for all this)')
+            } else if (commandOut == "notRunning") {
                 //Tidal not running
                 currentSong = "notRunning"
                 console.log("Tidal not running")
                 setLyrics("", "Tidal is not running.")
-            } else if (currentSong != "noEventsPerm" && currentSong != "noAccesibilityPerm" && currentSong != "notRunning" && currentSong != "unknownErr") {
-                //Unknown error (script failed?)
-                currentSong = "unknownErr"
-                console.log("Error: " + stderr)
-                setLyrics("", "Error:<br>" + stderr)
+            } else if (commandOut == "TIDAL") {
+                //Tidal is paused
+                currentSong = "TIDAL"
+                console.log("Paused")
+                setLyrics("", "Tidal is paused.")
+            } else if (commandOut.includes(" - ")) {
+                //Tidal is playing
+                currentSong = commandOut
+                console.log(commandOut)
+
+                //Replace / with * is used because Musixmatch doesn't like slashes in the search query
+                //Replace " - " with "* - " is used because Tidal sometimes ommits parentheses in the end of a title when it outputs the window title to save up space
+
+                searchQuery = commandOut.replace(" - ", "* - ").replace("/", "*")
+                setLyrics("", "Loading...")
+                searchMusixmatch(searchQuery)
+            } else if (commandOut != "Drag") {
+                //script failed (probably)
+                console.log("Error: " + stdout)
+                setLyrics("", "Error:<br>" + stdout)
             }
-        } else if (stdout == "TIDAL" && (currentSong != "TIDAL" || force)) {
-            //Tidal is paused
-            currentSong = "TIDAL"
-            console.log("Paused")
-            setLyrics("", "Tidal is paused.")
-        } else if (stdout.includes(" - ") && (currentSong != stdout || force)) {
-            //Tidal is playing
-            currentSong = stdout
-            console.log(stdout)
-            /*
-            Replace / with * is used because Musixmatch doesn't like slashes in the search query
-            Replace " - " with "* - " is used because Tidal sometimes ommits parentheses in the end of a title when it outputs the window title to save up space
-            */
-            searchQuery = currentSong.replace(" - ", "* - ").replace("/", "*")
-            setLyrics("", "Loading...")
-            //searchMusixmatch(searchQuery)
+
+
         }
 
+    })
 
-    });
 
 }
 

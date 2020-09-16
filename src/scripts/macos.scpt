@@ -1,5 +1,5 @@
 #!/usr/bin/env osascript
-global frontApp, windowTitle
+global windowTitle
 set windowTitle to ""
 tell application "System Events"
 	tell process "TIDAL"

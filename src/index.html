@@ -73,6 +73,10 @@
         ipcRenderer.send("aboutBtnEvent");
     });
 
+    ipcRenderer.on('setMacCloseSymbol', (event, arg) => {
+        document.getElementById("close-btn").innerHTML = "⨉"
+    })
+
     ipcRenderer.on('setLyrics', (event, arg) => {
         var values = arg.split('%%');
         var songName = values[0];
