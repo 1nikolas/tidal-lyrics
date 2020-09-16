@@ -25,7 +25,6 @@ Found a problem or want to suggest something? [Open an issue](https://github.com
 
 ## Credits
 - This app uses lyrics from [Musixmatch](https://www.musixmatch.com/)
-- This app uses [node-process-windows](https://github.com/bryphe/node-process-windows) to get the song information from Tidal.
 - Artwork icon: Music by Trident from the Noun Project
 
 ## License
