@@ -1,9 +1,9 @@
 const { app, BrowserWindow, Menu, ipcMain, dialog } = require('electron');
 const remote = require("electron").remote;
 const path = require('path');
-var processWindows = require("node-process-windows");
+const { exec } = require("child_process");
 var request = require("request");
-var currentSong = "";
+var currentSong = "---";
 var hasRetried = false;
 
 
@@ -119,37 +119,57 @@ app.on('activate', () => {
 
 
 function getSongInfo(force = false) {
+  
+if (process.platform == "win32"){
+    getSongInfoWin(force)
+} else if (process.platform == "darwin"){
+    getSongInfoMac(force)
+}
 
-    var activeProcesses = processWindows.getProcesses(function (err, processes) {
+}
 
-        processes.forEach(function (p) {
-            if (p.processName == "TIDAL" && p.mainWindowTitle != "" && p.mainWindowTitle != "Drag") {
+function getSongInfoWin(force){
 
+    exec("powershell -ExecutionPolicy Bypass -File " + __dirname + "\\scripts\\windows.ps1", (error, stdout, stderr) => {
+        
+        var commandOut = stdout.trim()
 
-                if (currentSong != p.mainWindowTitle || force) {
+        if (currentSong != commandOut || force){
 
-                    if (p.mainWindowTitle == "TIDAL") {
-                        currentSong = p.mainWindowTitle;
-                        console.log("paused")
-                        setLyrics("", "Tidal is paused.")
-                    } else {
-                        currentSong = p.mainWindowTitle;
+            currentSong = commandOut;
 
-                        console.log(p.mainWindowTitle);
-                        //Replace ? with * is used because some symbols/characters don't get read correctly by node-process-windows
-                        //Replace / with * is used because Musixmatch doesn't like slashes in the search query
-                        //Replace " - " with "* - " is used because Tidal sometimes ommits parentheses in the end of a title when it outputs the window title to save up space
-                        searchMusixmatch(currentSong.replaceAll("?", "*").replaceAll("/", "*").replaceAll(' - ', '* - '));
-                        setLyrics("", "Loading...")
-                    }
+            if (commandOut == ""){
+                //tidal not running
+                console.log("not running")
+                setLyrics("", "Tidal is not running.")
+            } else if (commandOut == "TIDAL"){
+                //tidal is paused
+                console.log("paused")
+                setLyrics("", "Tidal is paused.")
+            } else if (commandOut.includes(" - ")) {
+                //tidal is playing music
+                console.log(commandOut)
+                /*
+                Replace / with * is used because Musixmatch doesn't like slashes in the search query
+                Replace " - " with "* - " is used because Tidal sometimes ommits parentheses in the end of a title when it outputs the window title to save up space
+                */
+                searchQuery = commandOut.replace(" - ", "* - ").replace("/", "*")
+                setLyrics("", "Loading...")
+                searchMusixmatch(searchQuery)
+            } else {
+                //script failed (probably)
+                console.log(commandOut)
+                setLyrics("", "Error<br>" + commandOut)
 
-                }
             }
-        });
-
-
+        }
+        
     });
 
+
+}
+
+function getSongInfoMac(force){
 
 }
 

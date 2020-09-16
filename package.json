@@ -54,7 +54,6 @@
   "dependencies": {
     "electron-main-window": "^1.0.4",
     "electron-squirrel-startup": "^1.0.0",
-    "node-process-windows": "0.0.2",
     "request": "^2.88.2"
   },
   "devDependencies": {
