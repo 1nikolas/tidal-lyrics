@@ -1,3 +1,3 @@
 [Console]::OutputEncoding = [Text.UTF8Encoding]::UTF8
-$output = (Get-Process -name "TIDAL" -ErrorAction SilentlyContinue).MainWindowTitle
-Write-Host -NoNewline $output
+$err = $( $output = (Get-Process -name "TIDAL").MainWindowTitle ) 2>&1
+Write-Host -NoNewline $output $err

@@ -164,7 +164,7 @@ function getSongInfoWin(force) {
 
             currentSong = commandOut;
 
-            if (commandOut == "") {
+            if (commandOut.includes("Cannot find a process with the name")) {
                 //tidal not running
                 console.log("not running")
                 setLyrics("", "Tidal is not running.")
@@ -182,7 +182,7 @@ function getSongInfoWin(force) {
                 searchQuery = commandOut.replace(" - ", "* - ").replace("/", "*")
                 setLyrics("", "Loading...")
                 searchMusixmatch(searchQuery)
-            } else if (commandOut != "Drag") {
+            } else if (commandOut != "Drag" && commandOut != "") {
                 //script failed (probably)
                 console.log("Error: " + commandOut)
                 setLyrics("", "Error:<br>" + commandOut)
