@@ -160,7 +160,7 @@ function getSongInfoWin(force) {
 
         var commandOut = stdout.trim()
 
-        if (currentSong != commandOut || force) {
+        if ((currentSong != commandOut && commandOut != "Drag" && commandOut != "") || force) {
 
             currentSong = commandOut;
 
@@ -182,7 +182,7 @@ function getSongInfoWin(force) {
                 searchQuery = commandOut.replace(" - ", "* - ").replace("/", "*")
                 setLyrics("", "Loading...")
                 searchMusixmatch(searchQuery)
-            } else if (commandOut != "Drag" && commandOut != "") {
+            } else {
                 //script failed (probably)
                 console.log("Error: " + commandOut)
                 setLyrics("", "Error:<br>" + commandOut)
