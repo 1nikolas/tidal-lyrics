@@ -205,7 +205,8 @@ function getSongInfoMac(force) {
 
         var commandOut = stdout.trim()
 
-        if (commandOut != currentSong || force) {
+        if ((currentSong != commandOut && commandOut != "Drag" && commandOut != "") || force) {
+
             currentSong = commandOut
 
             if (commandOut == "noEventsPerm") {
