@@ -160,7 +160,7 @@ function getSongInfoWin(force) {
 
         var commandOut = stdout.trim()
 
-        if ((currentSong != commandOut && commandOut != "Drag" && commandOut != "") || force) {
+        if ((currentSong != commandOut || force) && commandOut != "Drag" && commandOut != "") {
 
             currentSong = commandOut;
 
@@ -205,7 +205,7 @@ function getSongInfoMac(force) {
 
         var commandOut = stdout.trim()
 
-        if ((currentSong != commandOut && commandOut != "Drag" && commandOut != "") || force) {
+        if ((currentSong != commandOut || force) && commandOut != "Drag" && commandOut != "") {
 
             currentSong = commandOut
 
