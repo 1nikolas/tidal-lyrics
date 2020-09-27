@@ -352,14 +352,14 @@ function getMusixmatchLyrics(searchQuery, lyricUrl) {
                 var lyrics = "";
 
                 var count = (body.match(/"body":"/g) || []).length;
-                if (count == 2) {
-                    //When body":" appears 2 times it means there is only one version of the lyrics so we need the first occurrence  of '"body":"'
+                if (count == 2 || count == 1) {
+                    //When '"body":"' appears 1 or 2 times it means there is only one version of the lyrics so we need the first occurrence  of '"body":"'
                     lyrics = body.substring(
                         body.indexOf(',"body":"') + 9,
                         body.lastIndexOf('","language":')
                     )
                 } else if (count == 3) {
-                    //When body":" appears 3 times it means that there are 2 versions of the lyrics so we need the second occurrence  of '"body":"' (the one visible on the website)
+                    //When '"body":"' appears 3 times it means that there are 2 versions of the lyrics so we need the second occurrence  of '"body":"' (the one visible on the website)
                     var indexOfFirstBody = body.indexOf(',"body":"');
 
                     lyrics = body.substring(
