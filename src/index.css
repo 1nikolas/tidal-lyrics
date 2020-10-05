@@ -83,6 +83,11 @@ body {
     font-size: large;
     text-align: right;
     font-family: Arial, Helvetica, sans-serif;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
 
 }
 
@@ -92,7 +97,7 @@ body {
     color: white;
     font-size: small;
     align-self: end;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     visibility: hidden;
 }
 

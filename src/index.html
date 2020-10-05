@@ -35,8 +35,8 @@
     </div>
 
     <div id="bottomArea">
-        <button id="refresh"><img id="refreshimg" src="./images/refresh.png"/></button>
-        <button id="about"><img id="aboutimg" src="./images/about.png"/></button>
+        <button id="refresh"><img id="refreshimg" src="./images/refresh.png" /></button>
+        <button id="about"><img id="aboutimg" src="./images/about.png" /></button>
     </div>
 </body>
 
@@ -49,6 +49,16 @@
             return false;
         }
     };
+
+    function scaleFontSize(element) {
+        var container = document.getElementById(element);
+
+        container.style.fontSize = "100%";
+
+        if (container.scrollWidth > container.clientWidth) {
+            container.style.fontSize = "70%";
+        }
+    }
 
     const ipcRenderer = require('electron').ipcRenderer;
 
@@ -84,6 +94,7 @@
         var artworkUrl = values[2];
         var lyricsUrl = values[3];
         document.getElementById("songtitle").innerHTML = songName;
+        scaleFontSize("songtitle");
         document.getElementById("lyrics").innerHTML = lyricsText;
         document.getElementById("lyrics").scrollIntoView();
 
@@ -95,10 +106,10 @@
 
         if (lyricsUrl != "none") {
             document.getElementById("musixmatchLink").href = lyricsUrl;
-            document.getElementById("sourcetext").style.visibility  = "visible";
+            document.getElementById("sourcetext").style.visibility = "visible";
         } else {
             //document.getElementById("musixmatchLink").href = "https://musixmatch.com/";
-            document.getElementById("sourcetext").style.visibility  = "hidden";
+            document.getElementById("sourcetext").style.visibility = "hidden";
         }
 
     })
