@@ -256,7 +256,7 @@ function getSongInfoMac(force) {
 
 
 function searchMusixmatch(searchQuery) {
-    request({ uri: "https://www.musixmatch.com/search/" + searchQuery },
+    request({ uri: "https://www.musixmatch.com/search/" + encodeURIComponent(searchQuery) },
         function (error, response, body) {
             console.log("https://www.musixmatch.com/search/" + searchQuery)
             if (error != null) {
