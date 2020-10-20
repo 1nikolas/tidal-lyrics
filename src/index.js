@@ -41,8 +41,7 @@ const createWindow = () => {
     request({ uri: "https://raw.githubusercontent.com/1nikolas/tidal-lyrics/master/version.txt" },
         function (error, response, body) {
             if (error == null) {
-                if (body.replace(/(\r\n|\n|\r)/gm, "") != app.getVersion()) {
-
+                if (!body.includes(app.getVersion())) {
                     //update available
                     var dialogIcon = null
                     if (process.platform == "darwin"){
