@@ -1,17 +1,17 @@
 # tidal-lyrics
-![icon](https://raw.githubusercontent.com/1nikolas/tidal-lyrics/master/src/images/icon.png)
+![icon](https://user-images.githubusercontent.com/30593419/96611798-b6594500-1305-11eb-9d3a-fd7e32f3b7c8.png)
 
 Simple app to get the lyrics of what you're listening on Tidal. Built with Electron.
 
-*Only Musixmatch is supported as a source for the time being.*
+*Only Musixmatch is supported as a lyric source for the time being.*
 
-![TIDAL_DxWD58h5Cy](https://user-images.githubusercontent.com/30593419/93001066-1acdfb00-f535-11ea-9e7c-6bae68962385.png)
+![screenshot](https://user-images.githubusercontent.com/30593419/93001066-1acdfb00-f535-11ea-9e7c-6bae68962385.png)
 
 ## Download
-Download the latest version from the [releases](https://github.com/1nikolas/tidal-lyrics/releases).
+Download the latest version from the [releases](https://github.com/1nikolas/tidal-lyrics/releases/latest).
 
 ## Problems and Suggestions
-Found a problem or want to suggest something? [Open an issue](https://github.com/1nikolas/tidal-lyrics/issues)!
+Found a problem or want to suggest something? [Open an issue](https://github.com/1nikolas/tidal-lyrics/issues/new)!
 
 ## TODO
 - ~~Add an icon~~
