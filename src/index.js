@@ -255,10 +255,10 @@ function getSongInfoMac(force) {
 }
 
 
-function searchMusixmatch(searchQuery) {
+function searchMusixmatch(searchQuery, oldSearchQuery = "") {
     request({ uri: "https://www.musixmatch.com/search/" + encodeURIComponent(searchQuery) },
         function (error, response, body) {
-            console.log("https://www.musixmatch.com/search/" + searchQuery)
+            console.log("https://www.musixmatch.com/search/" + encodeURIComponent(searchQuery))
             if (error != null) {
                 //error
                 console.log('searchMusixmatch error')
@@ -279,14 +279,17 @@ function searchMusixmatch(searchQuery) {
 
                     var newSearchQuery = searchQuery.replace(originalArtists, firstArtist)
 
-                    searchMusixmatch(newSearchQuery)
+                    searchMusixmatch(newSearchQuery, searchQuery)
 
 
                 } else {
 
-                    //track not found on musixmatch
-                    console.log('track not found on musixmatch')
-                    setLyrics("", "Track not found on Musixmatch.")
+                    //This is used because Musixmatch search is a bit borken sometimes and some songs only appear on the tracks tab (not in all results)
+                    if (oldSearchQuery == ""){
+                        oldSearchQuery = searchQuery
+                    }
+
+                    searchMusixmatchSlashTracks(oldSearchQuery)
 
                 }
             } else {
@@ -303,6 +306,37 @@ function searchMusixmatch(searchQuery) {
 
             }
         });
+}
+
+function searchMusixmatchSlashTracks(searchQuery){
+    request({ uri: "https://www.musixmatch.com/search/" + encodeURIComponent(searchQuery) + "/tracks" },
+        function (error, response, body) {
+            console.log("https://www.musixmatch.com/search/" + encodeURIComponent(searchQuery) + "/tracks")
+            if (error != null) {
+                //error
+                console.log('searchMusixmatch error')
+                setLyrics("", "Error.")
+
+            } else if (!body.includes("No tracks found")) {
+
+                var lyricsUrl = body.substring(
+                    body.indexOf('"track_edit_url":"') + 18,
+                    body.indexOf('edit?utm_source=')
+                );
+                lyricsUrl = JSON.parse('"' + lyricsUrl + '"').replace('"', "");
+
+                console.log(lyricsUrl);
+
+                getMusixmatchLyrics(searchQuery, lyricsUrl);
+
+            } else {
+                    //track not found on musixmatch
+                    console.log('track not found on musixmatch')
+                    setLyrics("", "Track not found on Musixmatch.")
+            }
+        })
+
+
 }
 
 function getMusixmatchLyrics(searchQuery, lyricUrl) {
