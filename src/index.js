@@ -19,7 +19,7 @@ const createWindow = () => {
         minWidth: 380,
         minHeight: 600,
         maxWidth: 380,
-        maxHeight: 600,
+        //maxHeight: 600,
         frame: false,
         resizable: true,
         icon: __dirname + '/images/icon.png',
