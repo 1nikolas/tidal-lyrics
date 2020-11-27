@@ -345,6 +345,34 @@ function getMusixmatchLyrics(searchQuery, lyricUrl) {
                 //error
                 console.log('getMusixmatchLyrics error');
                 setLyrics("", "Error.")
+
+            } else if (body.includes('>Instrumental<')) {
+
+                //song marked instrumental
+                console.log('song marked as instrumental');
+
+                var musixmatchTitle = body.substring(
+                    body.indexOf('<title data-react-helmet="true">') + 32,
+                    body.indexOf('Lyrics | Musixmatch</title>')
+                )
+
+                console.log(musixmatchTitle)
+
+                var coverUrl = body.substring(
+                    body.indexOf('"albumCoverart100x100":"') + 24,
+                    body.indexOf('","albumCoverart350x350"')
+                )
+                coverUrl = JSON.parse('"' + coverUrl + '"').replace('"', "");
+
+                console.log(coverUrl);
+
+                if (!coverUrl.includes('nocover')) {
+                    setLyrics(musixmatchTitle, "Song is marked as Instrumental.", coverUrl, lyricUrl);
+                } else {
+                    setLyrics(musixmatchTitle, "Song is marked as Instrumental.", "none", lyricUrl);
+                }
+
+
             } else if (body.includes('Lyrics not available') || body.includes("Unfortunately we're not authorized to show these lyrics")) {
 
                 //lyrics not available on Musixmatch
