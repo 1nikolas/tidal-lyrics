@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, ipcMain, dialog, nativeImage } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain, dialog, nativeImage, globalShortcut } = require('electron');
 const remote = require("electron").remote;
 const path = require('path');
 const { exec } = require("child_process");
@@ -44,7 +44,7 @@ const createWindow = () => {
                 if (!body.includes(app.getVersion())) {
                     //update available
                     var dialogIcon = null
-                    if (process.platform == "darwin"){
+                    if (process.platform == "darwin") {
                         dialogIcon = __dirname + "/images/icon.png"
                     }
                     dialog.showMessageBox(mainWindow, {
@@ -56,9 +56,9 @@ const createWindow = () => {
                     }).then(result => {
                         if (result.response === 0) {
                             require('electron').shell.openExternal("https://github.com/1nikolas/tidal-lyrics/releases");
-                            if (process.platform == "win32"){
+                            if (process.platform == "win32") {
                                 app.quit()
-                            } else if (process.platform == "darwin"){
+                            } else if (process.platform == "darwin") {
                                 setTimeout(app.quit(), 1000);
                             }
                         }
@@ -69,7 +69,13 @@ const createWindow = () => {
         }
     )
 
-    //mainWindow.webContents.openDevTools();
+    //for debugging purposes
+    globalShortcut.registerAll(["CommandOrControl+Alt+Shift+D"], () => {
+        if (mainWindow.isFocused) {
+            mainWindow.webContents.openDevTools();
+        }
+    });
+
 
     Menu.setApplicationMenu(null)
 
@@ -114,7 +120,7 @@ const createWindow = () => {
 
 };
 
-if (process.platform == "darwin"){
+if (process.platform == "darwin") {
     app.dock.setIcon(nativeImage.createFromPath(__dirname + "/images/icon.png"));
 }
 
@@ -284,7 +290,7 @@ function searchMusixmatch(searchQuery, oldSearchQuery = "") {
                 } else {
 
                     //This is used because Musixmatch search is a bit borken sometimes and some songs only appear on the tracks tab (not in all results)
-                    if (oldSearchQuery == ""){
+                    if (oldSearchQuery == "") {
                         oldSearchQuery = searchQuery
                     }
 
@@ -307,7 +313,7 @@ function searchMusixmatch(searchQuery, oldSearchQuery = "") {
         });
 }
 
-function searchMusixmatchSlashTracks(searchQuery){
+function searchMusixmatchSlashTracks(searchQuery) {
     request({ uri: "https://www.musixmatch.com/search/" + encodeURIComponent(searchQuery) + "/tracks" },
         function (error, response, body) {
             console.log("https://www.musixmatch.com/search/" + encodeURIComponent(searchQuery) + "/tracks")
@@ -329,9 +335,9 @@ function searchMusixmatchSlashTracks(searchQuery){
                 getMusixmatchLyrics(searchQuery, lyricsUrl);
 
             } else {
-                    //track not found on musixmatch
-                    console.log('track not found on musixmatch')
-                    setLyrics("", "Track not found on Musixmatch.")
+                //track not found on musixmatch
+                console.log('track not found on musixmatch')
+                setLyrics("", "Track not found on Musixmatch.")
             }
         })
 
