@@ -261,9 +261,9 @@ function getSongInfoMac(force) {
 
 
 function searchMusixmatch(searchQuery, oldSearchQuery = "") {
-    request({ uri: "https://www.musixmatch.com/search/" + encodeURIComponent(searchQuery) },
+    request({ uri: "https://www.musixmatch.com/search/" + encodeURIComponent(searchQuery).replace("%26", "&") },
         function (error, response, body) {
-            console.log("https://www.musixmatch.com/search/" + encodeURIComponent(searchQuery))
+            console.log("https://www.musixmatch.com/search/" + encodeURIComponent(searchQuery).replace("%26", "&"))
             if (error != null) {
                 //error
                 console.log('searchMusixmatch error')
@@ -314,9 +314,9 @@ function searchMusixmatch(searchQuery, oldSearchQuery = "") {
 }
 
 function searchMusixmatchSlashTracks(searchQuery) {
-    request({ uri: "https://www.musixmatch.com/search/" + encodeURIComponent(searchQuery) + "/tracks" },
+    request({ uri: "https://www.musixmatch.com/search/" + encodeURIComponent(searchQuery).replace("%26", "&") + "/tracks" },
         function (error, response, body) {
-            console.log("https://www.musixmatch.com/search/" + encodeURIComponent(searchQuery) + "/tracks")
+            console.log("https://www.musixmatch.com/search/" + encodeURIComponent(searchQuery).replace("%26", "&") + "/tracks")
             if (error != null) {
                 //error
                 console.log('searchMusixmatch error')
