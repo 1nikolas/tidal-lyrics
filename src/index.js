@@ -5,6 +5,7 @@ const { exec } = require("child_process");
 var request = require("request");
 var currentSong = "---";
 var hasRetried = false;
+var hasRetried2 = false;
 var isCommandRunning = false;
 
 
@@ -287,6 +288,30 @@ function searchMusixmatch(searchQuery, oldSearchQuery = "") {
                     searchMusixmatch(newSearchQuery, searchQuery)
 
 
+                } else if (!hasRetried2 && ( (searchQuery.includes(' (') || oldSearchQuery.includes(' (')) || (searchQuery.includes(' [') || oldSearchQuery.includes(' [')) ) ) {
+
+                    //This is used to retry if it can't find a song due to being on Musixmatch without parenthesis/brackets postfixes (see issue #6 for more details)
+                    //It removes the paremtheses/brackets from the song title
+
+                    hasRetried2 = true;
+
+                    var queryToUse = ""
+                    if (oldSearchQuery == ""){
+                        queryToUse = searchQuery
+                    } else {
+                        queryToUse = oldSearchQuery
+                    }
+
+                    var splitedQuery = queryToUse.split(' - ')
+                    var originalSongName = splitedQuery[0]
+                    
+                    var newSongName = originalSongName.replace(/\(([^)]+)\)/, '').replace(' *', '*').replace(/\[([^\]]+)]/, '').replace(' *', '*')
+
+                    var newSearchQuery = queryToUse.replace(originalSongName, newSongName)
+
+                    searchMusixmatch(newSearchQuery, queryToUse)
+
+
                 } else {
 
                     //This is used because Musixmatch search is a bit borken sometimes and some songs only appear on the tracks tab (not in all results)
@@ -463,6 +488,7 @@ function setLyrics(searchQuery, lyrics, coverUrl = "none", lyricsUrl = "none") {
     const window = require('electron-main-window').getMainWindow();
 
     hasRetried = false;
+    hasRetried2 = false;
 
     window.webContents.send('setLyrics', searchQuery + "%%" + lyrics + "%%" + coverUrl + "%%" + lyricsUrl)
 }
