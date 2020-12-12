@@ -2,7 +2,7 @@
   "name": "tidal-lyrics",
   "productName": "tidal-lyrics",
   "version": "1.4.0",
-  "description": " Get the lyrics of what you're listening on Tidal",
+  "description": "Get the lyrics of what you're listening on Tidal",
   "main": "src/index.js",
   "win": {
     "icon": "./src/images/icon.ico"
