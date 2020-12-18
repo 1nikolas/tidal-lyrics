@@ -1,4 +1,5 @@
 const { app, BrowserWindow, Menu, ipcMain, dialog, nativeImage, globalShortcut } = require('electron');
+const fs = require("fs");
 const remote = require("electron").remote;
 const path = require('path');
 const { exec } = require("child_process");
@@ -7,6 +8,7 @@ var currentSong = "---";
 var hasRetried = false;
 var hasRetried2 = false;
 var isCommandRunning = false;
+var log = ""
 
 
 if (require('electron-squirrel-startup')) {
@@ -37,7 +39,7 @@ const createWindow = () => {
         }
     })
 
-    console.log(app.getVersion())
+    appLog('Version: ' + app.getVersion())
 
     request({ uri: "https://raw.githubusercontent.com/1nikolas/tidal-lyrics/master/version.txt" },
         function (error, response, body) {
@@ -106,12 +108,25 @@ const createWindow = () => {
     ipcMain.on("aboutBtnEvent", function (event) {
 
         dialog.showMessageBox(mainWindow, {
-            buttons: ["OK", "Visit tidal-lyrics on Github"],
+            buttons: ["OK", "Visit tidal-lyrics on Github", "View Logs"],
             message: "tidal-lyrics " + app.getVersion() + "\nMade by Nikolas Spiridakis",
             icon: __dirname + "/images/icon.png"
         }).then(result => {
             if (result.response === 1) {
                 require('electron').shell.openExternal("https://github.com/1nikolas/tidal-lyrics/");
+            } else if (result.response === 2) {
+                var logPath = app.getPath("logs") + "/app.log"
+                if (fs.existsSync(logPath)) {
+                    fs.unlinkSync(logPath)
+                }
+                fs.writeFile(logPath, log, function (err) {
+                    if (err) {
+                        dialog.showErrorBox(mainWindow, {
+                            message: 'Error showing log: ' + err
+                        })
+                    }
+                })
+                require('electron').shell.openExternal(logPath)
             }
         })
 
@@ -172,15 +187,16 @@ function getSongInfoWin(force) {
 
             if (commandOut.includes("Cannot find a process with the name")) {
                 //tidal not running
-                console.log("not running")
+                appLog("State: Not running")
                 setLyrics("", "Tidal is not running.")
             } else if (commandOut == "TIDAL") {
                 //tidal is paused
-                console.log("paused")
+                appLog("State: Paused")
                 setLyrics("", "Tidal is paused.")
             } else if (commandOut.includes(" - ")) {
                 //tidal is playing music
-                console.log(commandOut)
+                appLog('\n-------------------------------\n')
+                appLog('State: Playing ' + commandOut)
 
                 //Replace / with * is used because Musixmatch doesn't like slashes in the search query
                 //Replace " - " with "* - " is used because Tidal sometimes ommits parentheses in the end of a title when it outputs the window title to save up space
@@ -190,7 +206,7 @@ function getSongInfoWin(force) {
                 searchMusixmatch(searchQuery)
             } else {
                 //script failed (probably)
-                console.log("Error: " + commandOut)
+                appLog("Error: " + commandOut)
                 setLyrics("", "Error:<br>" + commandOut)
 
             }
@@ -218,27 +234,28 @@ function getSongInfoMac(force) {
             if (commandOut == "noEventsPerm") {
                 //System Events.App permission not granted
                 currentSong = "noEventsPerm"
-                console.log("System Events.App permission not granted")
+                appLog("System Events.App permission not granted")
                 setLyrics("", 'Please grant System Events.App permission<br><br>If the permission dialog didn\'t come up you have to grant it manually:<br>1. Go to Settings<br>2. Security & Privacy<br>3. Go to Privacy Tab<br>4. Choose Automation<br>5. Under tidal-lyrics tick "System Events.App"<br><br>(Blame Apple for all this)')
             } else if (commandOut == "noAccessibilityPerm") {
                 //Accessibility permission not granted
                 currentSong = "noAccessibilityPerm"
-                console.log("Accessibility permission not granted")
+                appLog("Accessibility permission not granted")
                 setLyrics("", 'Please grant Accessibility permission<br><br>If the permission dialog didn\'t come up you have to grant it manually:<br>1. Go to Settings<br>2. Security & Privacy<br>3. Go to Privacy Tab<br>4. Choose Accecibility<br>5. Click the lock icon on the bottom left and enter your password<br>6. Tick tidal-lyrics<br><br>(Blame Apple for all this)')
             } else if (commandOut == "notRunning") {
                 //Tidal not running
                 currentSong = "notRunning"
-                console.log("Tidal not running")
+                appLog("State: Not running")
                 setLyrics("", "Tidal is not running.")
             } else if (commandOut == "TIDAL") {
                 //Tidal is paused
                 currentSong = "TIDAL"
-                console.log("Paused")
+                appLog("State: Paused")
                 setLyrics("", "Tidal is paused.")
             } else if (commandOut.includes(" - ")) {
                 //Tidal is playing
                 currentSong = commandOut
-                console.log(commandOut)
+                appLog('\n-------------------------------\n')
+                appLog('State: Playing ' + commandOut)
 
                 //Replace / with * is used because Musixmatch doesn't like slashes in the search query
                 //Replace " - " with "* - " is used because Tidal sometimes ommits parentheses in the end of a title when it outputs the window title to save up space
@@ -248,7 +265,7 @@ function getSongInfoMac(force) {
                 searchMusixmatch(searchQuery)
             } else if (commandOut != "Drag") {
                 //script failed (probably)
-                console.log("Error: " + stdout)
+                appLog("Error: " + stdout)
                 setLyrics("", "Error:<br>" + stdout)
             }
 
@@ -264,11 +281,11 @@ function getSongInfoMac(force) {
 function searchMusixmatch(searchQuery, oldSearchQuery = "") {
     request({ uri: "https://www.musixmatch.com/search/" + encodeURIComponent(searchQuery).replace("%26", "&") },
         function (error, response, body) {
-            console.log("https://www.musixmatch.com/search/" + encodeURIComponent(searchQuery).replace("%26", "&"))
+            appLog("Search URL: https://www.musixmatch.com/search/" + encodeURIComponent(searchQuery).replace("%26", "&"))
             if (error != null) {
                 //error
-                console.log('searchMusixmatch error')
-                setLyrics("", "Error.")
+                appLog('Search Failed (Internet Error?)')
+                setLyrics("", "Error (No Internet?)<br>Try clicking refresh")
 
             } else if (!body.includes("Best Result")) {
 
@@ -288,7 +305,7 @@ function searchMusixmatch(searchQuery, oldSearchQuery = "") {
                     searchMusixmatch(newSearchQuery, searchQuery)
 
 
-                } else if (!hasRetried2 && ( (searchQuery.includes(' (') || oldSearchQuery.includes(' (')) || (searchQuery.includes(' [') || oldSearchQuery.includes(' [')) ) ) {
+                } else if (!hasRetried2 && ((searchQuery.includes(' (') || oldSearchQuery.includes(' (')) || (searchQuery.includes(' [') || oldSearchQuery.includes(' [')))) {
 
                     //This is used to retry if it can't find a song due to being on Musixmatch without parenthesis/brackets postfixes (see issue #6 for more details)
                     //It removes the paremtheses/brackets from the song title
@@ -296,7 +313,7 @@ function searchMusixmatch(searchQuery, oldSearchQuery = "") {
                     hasRetried2 = true;
 
                     var queryToUse = ""
-                    if (oldSearchQuery == ""){
+                    if (oldSearchQuery == "") {
                         queryToUse = searchQuery
                     } else {
                         queryToUse = oldSearchQuery
@@ -304,7 +321,7 @@ function searchMusixmatch(searchQuery, oldSearchQuery = "") {
 
                     var splitedQuery = queryToUse.split(' - ')
                     var originalSongName = splitedQuery[0]
-                    
+
                     var newSongName = originalSongName.replace(/\(([^)]+)\)/, '').replace(' *', '*').replace(/\[([^\]]+)]/, '').replace(' *', '*')
 
                     var newSearchQuery = queryToUse.replace(originalSongName, newSongName)
@@ -328,9 +345,12 @@ function searchMusixmatch(searchQuery, oldSearchQuery = "") {
                     body.indexOf('"track_edit_url":"') + 18,
                     body.indexOf('edit?utm_source=')
                 );
+
+                appLog('Unicode Lyrics URL: ' + lyricsUrl)
+
                 lyricsUrl = JSON.parse('"' + lyricsUrl + '"').replace('"', "");
 
-                console.log(lyricsUrl);
+                appLog('Lyrics URL: ' + lyricsUrl);
 
                 getMusixmatchLyrics(searchQuery, lyricsUrl);
 
@@ -341,11 +361,11 @@ function searchMusixmatch(searchQuery, oldSearchQuery = "") {
 function searchMusixmatchSlashTracks(searchQuery) {
     request({ uri: "https://www.musixmatch.com/search/" + encodeURIComponent(searchQuery).replace("%26", "&") + "/tracks" },
         function (error, response, body) {
-            console.log("https://www.musixmatch.com/search/" + encodeURIComponent(searchQuery).replace("%26", "&") + "/tracks")
+            appLog("Search URL: https://www.musixmatch.com/search/" + encodeURIComponent(searchQuery).replace("%26", "&") + "/tracks")
             if (error != null) {
                 //error
-                console.log('searchMusixmatch error')
-                setLyrics("", "Error.")
+                appLog('Search Failed (Internet Error?)')
+                setLyrics("", "Error (No Internet?)<br>Try clicking refresh")
 
             } else if (!body.includes("No tracks found")) {
 
@@ -353,15 +373,18 @@ function searchMusixmatchSlashTracks(searchQuery) {
                     body.indexOf('"track_edit_url":"') + 18,
                     body.indexOf('edit?utm_source=')
                 );
+
+                appLog('Unicode Lyrics URL: ' + lyricsUrl)
+
                 lyricsUrl = JSON.parse('"' + lyricsUrl + '"').replace('"', "");
 
-                console.log(lyricsUrl);
+                appLog('Lyrics URL: ' + lyricsUrl);
 
                 getMusixmatchLyrics(searchQuery, lyricsUrl);
 
             } else {
                 //track not found on musixmatch
-                console.log('track not found on musixmatch')
+                appLog('Error: Track not on Musixmatch')
                 setLyrics("", "Track not found on Musixmatch.")
             }
         })
@@ -374,20 +397,20 @@ function getMusixmatchLyrics(searchQuery, lyricUrl) {
         function (error, response, body) {
             if (error != null) {
                 //error
-                console.log('getMusixmatchLyrics error');
-                setLyrics("", "Error.")
+                appLog('Can\'t get lyrics (Internet Error?)');
+                setLyrics("", "Error (No Internet?)<br>Try clicking refresh")
 
             } else if (body.includes('>Instrumental<')) {
 
                 //song marked instrumental
-                console.log('song marked as instrumental');
 
                 var musixmatchTitle = body.substring(
                     body.indexOf('<title data-react-helmet="true">') + 32,
                     body.indexOf('Lyrics | Musixmatch</title>')
                 )
 
-                console.log(musixmatchTitle)
+                appLog('Song found on Musixmatch: ' + musixmatchTitle)
+                appLog('Error: Song is marked as instrumental');
 
                 var coverUrl = body.substring(
                     body.indexOf('"albumCoverart100x100":"') + 24,
@@ -395,7 +418,7 @@ function getMusixmatchLyrics(searchQuery, lyricUrl) {
                 )
                 coverUrl = JSON.parse('"' + coverUrl + '"').replace('"', "");
 
-                console.log(coverUrl);
+                appLog('Cover URL: ' + coverUrl);
 
                 if (!coverUrl.includes('nocover')) {
                     setLyrics(musixmatchTitle, "Song is marked as Instrumental.", coverUrl, lyricUrl);
@@ -407,14 +430,14 @@ function getMusixmatchLyrics(searchQuery, lyricUrl) {
             } else if (body.includes('Lyrics not available') || body.includes("Unfortunately we're not authorized to show these lyrics")) {
 
                 //lyrics not available on Musixmatch
-                console.log('lyrics not available on Musixmatch');
 
                 var musixmatchTitle = body.substring(
                     body.indexOf('<title data-react-helmet="true">') + 32,
                     body.indexOf('Lyrics | Musixmatch</title>')
                 )
 
-                console.log(musixmatchTitle)
+                appLog('Song found on Musixmatch: ' + musixmatchTitle)
+                appLog('Error: Lyrics not available on Musixmatch');
 
                 var coverUrl = body.substring(
                     body.indexOf('"albumCoverart100x100":"') + 24,
@@ -422,7 +445,7 @@ function getMusixmatchLyrics(searchQuery, lyricUrl) {
                 )
                 coverUrl = JSON.parse('"' + coverUrl + '"').replace('"', "");
 
-                console.log(coverUrl);
+                appLog('Cover URL: ' + coverUrl);
 
                 if (!coverUrl.includes('nocover')) {
                     setLyrics(musixmatchTitle, "Lyrics not available on Musixmatch.", coverUrl, lyricUrl);
@@ -439,7 +462,7 @@ function getMusixmatchLyrics(searchQuery, lyricUrl) {
                     body.indexOf('Lyrics | Musixmatch</title>')
                 )
 
-                console.log(musixmatchTitle)
+                appLog('Song found on Musixmatch: ' + musixmatchTitle)
 
                 var lyrics = "";
 
@@ -469,8 +492,8 @@ function getMusixmatchLyrics(searchQuery, lyricUrl) {
                 )
                 coverUrl = JSON.parse('"' + coverUrl + '"').replace('"', "");
 
-                console.log(coverUrl);
-                console.log(lyrics);
+                appLog('Cover URL: ' + coverUrl);
+                appLog('Lyrics: ' + lyrics);
 
                 if (!coverUrl.includes('nocover')) {
                     setLyrics(musixmatchTitle, lyrics, coverUrl, lyricUrl)
@@ -491,5 +514,10 @@ function setLyrics(searchQuery, lyrics, coverUrl = "none", lyricsUrl = "none") {
     hasRetried2 = false;
 
     window.webContents.send('setLyrics', searchQuery + "%%" + lyrics + "%%" + coverUrl + "%%" + lyricsUrl)
+}
+
+function appLog(line) {
+    log += line + '\n'
+    console.log(line)
 }
 
