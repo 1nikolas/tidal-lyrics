@@ -8,7 +8,7 @@ var currentSong = "---";
 var hasRetried = false;
 var hasRetried2 = false;
 var isCommandRunning = false;
-var log = ""
+var logPath = app.getPath("logs") + "/app.log"
 
 
 if (require('electron-squirrel-startup')) {
@@ -38,6 +38,10 @@ const createWindow = () => {
             mainWindow.webContents.send('setMacCloseSymbol')
         }
     })
+
+    if (fs.existsSync(logPath)) {
+        fs.unlinkSync(logPath)
+    }
 
     appLog('Version: ' + app.getVersion())
 
@@ -115,17 +119,6 @@ const createWindow = () => {
             if (result.response === 1) {
                 require('electron').shell.openExternal("https://github.com/1nikolas/tidal-lyrics/");
             } else if (result.response === 2) {
-                var logPath = app.getPath("logs") + "/app.log"
-                if (fs.existsSync(logPath)) {
-                    fs.unlinkSync(logPath)
-                }
-                fs.writeFile(logPath, log, function (err) {
-                    if (err) {
-                        dialog.showErrorBox(mainWindow, {
-                            message: 'Error showing log: ' + err
-                        })
-                    }
-                })
                 require('electron').shell.openExternal(logPath)
             }
         })
@@ -517,7 +510,7 @@ function setLyrics(searchQuery, lyrics, coverUrl = "none", lyricsUrl = "none") {
 }
 
 function appLog(line) {
-    log += line + '\n'
+    fs.appendFileSync(logPath, line + '\n');
     console.log(line)
 }
 
