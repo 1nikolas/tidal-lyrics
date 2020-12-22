@@ -11,18 +11,18 @@ Simple app to get the lyrics of what you're listening on Tidal. Built with Elect
 Download the latest version from the [releases](https://github.com/1nikolas/tidal-lyrics/releases/latest).
 
 ## Problems and Suggestions
-Found a problem or want to suggest something? [Open an issue](https://github.com/1nikolas/tidal-lyrics/issues/new)!
+Found a problem or want to suggest something? [Open an issue](https://github.com/1nikolas/tidal-lyrics/issues/new)! If you want to report a problem, be sure to include the logs from the about menu.
 
 ## TODO
-- ~~Add an icon~~
-- ~~Add a refresh button (if something messes up)~~
 - Make custom dialogs (default dialogs don't look great on MacOS)
 - Always on top option
 - Make the app look better
 - Make the app not look empty when Tidal is paused
-- ~~Support MacOS~~
 - Add some font
 - Support more lyric sources and add options menu
+- ~~Add an icon~~
+- ~~Add a refresh button (if something messes up)~~
+- ~~Support MacOS~~
 
 ## Credits
 - This app uses lyrics from [Musixmatch](https://www.musixmatch.com/)
