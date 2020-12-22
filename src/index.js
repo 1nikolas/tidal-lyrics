@@ -342,8 +342,8 @@ function searchMusixmatch(searchQuery, oldSearchQuery = "") {
             } else {
 
                 var lyricsUrl = body.substring(
-                    body.indexOf('"track_edit_url":"') + 18,
-                    body.indexOf('edit?utm_source=')
+                    body.indexOf('"track_share_url":"') + 19,
+                    body.indexOf('?utm_source=application')
                 );
 
                 appLog('Unicode Lyrics URL: ' + lyricsUrl)
@@ -370,8 +370,8 @@ function searchMusixmatchSlashTracks(searchQuery) {
             } else if (!body.includes("No tracks found")) {
 
                 var lyricsUrl = body.substring(
-                    body.indexOf('"track_edit_url":"') + 18,
-                    body.indexOf('edit?utm_source=')
+                    body.indexOf('"track_share_url":"') + 19,
+                    body.indexOf('?utm_source=application')
                 );
 
                 appLog('Unicode Lyrics URL: ' + lyricsUrl)
