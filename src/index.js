@@ -119,7 +119,12 @@ const createWindow = () => {
             if (result.response === 1) {
                 require('electron').shell.openExternal("https://github.com/1nikolas/tidal-lyrics/");
             } else if (result.response === 2) {
-                require('electron').shell.openExternal(logPath)
+                if (process.platform == "win32") {
+                    require('electron').shell.openExternal(logPath)
+                } else if (process.platform == "darwin") {
+                    exec("open -t " + logPath)
+                }
+
             }
         })
 
