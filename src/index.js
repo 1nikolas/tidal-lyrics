@@ -277,9 +277,9 @@ function getSongInfoMac(force) {
 
 
 function searchMusixmatch(searchQuery, oldSearchQuery = "") {
-    request({ uri: "https://www.musixmatch.com/search/" + encodeURIComponent(searchQuery).replace("%26", "&") },
+    request({ uri: "https://www.musixmatch.com/search/" + encodeURIComponent(searchQuery).replace("%26", "&").replace("%2B", "+") },
         function (error, response, body) {
-            appLog("Search URL: https://www.musixmatch.com/search/" + encodeURIComponent(searchQuery).replace("%26", "&"))
+            appLog("Search URL: https://www.musixmatch.com/search/" + encodeURIComponent(searchQuery).replace("%26", "&").replace("%2B", "+"))
             if (error != null) {
                 //error
                 appLog('Search Failed (Internet Error?)')
@@ -357,9 +357,9 @@ function searchMusixmatch(searchQuery, oldSearchQuery = "") {
 }
 
 function searchMusixmatchSlashTracks(searchQuery) {
-    request({ uri: "https://www.musixmatch.com/search/" + encodeURIComponent(searchQuery).replace("%26", "&") + "/tracks" },
+    request({ uri: "https://www.musixmatch.com/search/" + encodeURIComponent(searchQuery).replace("%26", "&").replace("%2B", "+") + "/tracks" },
         function (error, response, body) {
-            appLog("Search URL: https://www.musixmatch.com/search/" + encodeURIComponent(searchQuery).replace("%26", "&") + "/tracks")
+            appLog("Search URL: https://www.musixmatch.com/search/" + encodeURIComponent(searchQuery).replace("%26", "&").replace("%2B", "+") + "/tracks")
             if (error != null) {
                 //error
                 appLog('Search Failed (Internet Error?)')
