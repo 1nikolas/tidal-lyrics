@@ -173,11 +173,15 @@ function getSongInfoWin(force) {
 
     isCommandRunning = true
 
-    exec("powershell -ExecutionPolicy Bypass -File " + __dirname + "\\scripts\\windows.ps1", (error, stdout, stderr) => {
+    exec("powershell -ExecutionPolicy Bypass -File \"" + __dirname + "\\scripts\\windows.ps1\"", (error, stdout, stderr) => {
 
         isCommandRunning = false
 
         var commandOut = stdout.trim()
+
+        if (stderr){
+            appLog('Powershell stderr: ' + stderr)
+        }
 
         if ((currentSong != commandOut || force) && commandOut != "Drag" && commandOut != "") {
 
