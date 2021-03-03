@@ -495,7 +495,7 @@ function getMusixmatchLyrics(searchQuery, lyricUrl) {
                 coverUrl = JSON.parse('"' + coverUrl + '"').replace('"', "");
 
                 appLog('Cover URL: ' + coverUrl);
-                appLog('Lyrics: ' + lyrics);
+                //appLog('Lyrics: ' + lyrics);
 
                 if (!coverUrl.includes('nocover')) {
                     setLyrics(musixmatchTitle, lyrics, coverUrl, lyricUrl)
