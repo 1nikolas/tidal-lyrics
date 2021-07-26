@@ -343,18 +343,27 @@ function searchMusixmatch(searchQuery, oldSearchQuery = "") {
                 }
             } else {
 
-                var lyricsUrl = body.substring(
+                var lyricsUrlUnicode = body.substring(
                     body.indexOf('"track_share_url":"') + 19,
                     body.indexOf('?utm_source=application')
                 );
 
-                appLog('Unicode Lyrics URL: ' + lyricsUrl)
+                appLog('Unicode Lyrics URL: ' + lyricsUrlUnicode)
 
-                lyricsUrl = JSON.parse('"' + lyricsUrl + '"').replace('"', "");
+                var lyricsUrl = 'none'
 
-                appLog('Lyrics URL: ' + lyricsUrl);
+                try {
+                    lyricsUrl = JSON.parse('"' + lyricsUrlUnicode + '"').replace('"', "");
+                } catch (error) {
+                    appLog('Error: ' + error)
+                    setLyrics("", "Error. Please refresh.")
+                }
 
-                getMusixmatchLyrics(searchQuery, lyricsUrl);
+                if (lyricsUrl != 'none'){
+                    appLog('Lyrics URL: ' + lyricsUrl);
+
+                    getMusixmatchLyrics(searchQuery, lyricsUrl);
+                }
 
             }
         });
@@ -371,18 +380,28 @@ function searchMusixmatchSlashTracks(searchQuery) {
 
             } else if (!body.includes("No tracks found")) {
 
-                var lyricsUrl = body.substring(
+                var lyricsUrlUnicode = body.substring(
                     body.indexOf('"track_share_url":"') + 19,
                     body.indexOf('?utm_source=application')
                 );
 
-                appLog('Unicode Lyrics URL: ' + lyricsUrl)
+                appLog('Unicode Lyrics URL: ' + lyricsUrlUnicode)
 
-                lyricsUrl = JSON.parse('"' + lyricsUrl + '"').replace('"', "");
+                var lyricsUrl = 'none';
 
-                appLog('Lyrics URL: ' + lyricsUrl);
+                try {
+                    lyricsUrl = JSON.parse('"' + lyricsUrlUnicode + '"').replace('"', "");
+                } catch (error){
+                    appLog('Error: ' + error)
+                    setLyrics("", "Error. Please refresh.")
+                }
 
-                getMusixmatchLyrics(searchQuery, lyricsUrl);
+                if (lyricsUrl != 'none'){
+                    appLog('Lyrics URL: ' + lyricsUrl);
+
+                    getMusixmatchLyrics(searchQuery, lyricsUrl);
+                }
+
 
             } else {
                 //track not found on musixmatch
@@ -414,18 +433,30 @@ function getMusixmatchLyrics(searchQuery, lyricUrl) {
                 appLog('Song found on Musixmatch: ' + musixmatchTitle)
                 appLog('Error: Song is marked as instrumental');
 
-                var coverUrl = body.substring(
+                var coverUrlUnicode = body.substring(
                     body.indexOf('"albumCoverart100x100":"') + 24,
                     body.indexOf('","albumCoverart350x350"')
                 )
-                coverUrl = JSON.parse('"' + coverUrl + '"').replace('"', "");
 
-                appLog('Cover URL: ' + coverUrl);
+                appLog("Unicode Cover URL: " + coverUrlUnicode)
 
-                if (!coverUrl.includes('nocover')) {
-                    setLyrics(musixmatchTitle, "Song is marked as Instrumental.", coverUrl, lyricUrl);
-                } else {
-                    setLyrics(musixmatchTitle, "Song is marked as Instrumental.", "none", lyricUrl);
+                var coverUrl = 'none'
+
+                try {
+                    coverUrl = JSON.parse('"' + coverUrlUnicode + '"').replace('"', "");
+                } catch (error) {
+                    appLog('Error: ' + error)
+                    setLyrics("", "Error. Please refresh.")
+                }
+
+                if (coverUrl != 'none'){
+                    appLog('Cover URL: ' + coverUrl);
+
+                    if (!coverUrl.includes('nocover')) {
+                        setLyrics(musixmatchTitle, "Song is marked as Instrumental.", coverUrl, lyricUrl);
+                    } else {
+                        setLyrics(musixmatchTitle, "Song is marked as Instrumental.", "none", lyricUrl);
+                    }
                 }
 
 
@@ -441,21 +472,33 @@ function getMusixmatchLyrics(searchQuery, lyricUrl) {
                 appLog('Song found on Musixmatch: ' + musixmatchTitle)
                 appLog('Error: Lyrics not available on Musixmatch');
 
-                var coverUrl = body.substring(
+                var coverUrlUnicode = body.substring(
                     body.indexOf('"albumCoverart100x100":"') + 24,
                     body.indexOf('","albumCoverart350x350"')
                 )
-                coverUrl = JSON.parse('"' + coverUrl + '"').replace('"', "");
 
-                appLog('Cover URL: ' + coverUrl);
+                appLog("Unicode Cover URL: " + coverUrlUnicode)
 
-                if (!coverUrl.includes('nocover')) {
-                    setLyrics(musixmatchTitle, "Lyrics not available on Musixmatch.", coverUrl, lyricUrl);
-                } else {
-                    setLyrics(musixmatchTitle, "Lyrics not available on Musixmatch.", "none", lyricUrl);
+                var coverUrl = 'none'
+
+                try {
+                    coverUrl = JSON.parse('"' + coverUrlUnicode + '"').replace('"', "");
+                } catch (error) {
+                    appLog('Error: ' + error)
+                    setLyrics("", "Error. Please refresh.")
                 }
 
+                if (coverUrl != 'none'){
 
+                    appLog('Cover URL: ' + coverUrl);
+
+                    if (!coverUrl.includes('nocover')) {
+                        setLyrics(musixmatchTitle, "Lyrics not available on Musixmatch.", coverUrl, lyricUrl);
+                    } else {
+                        setLyrics(musixmatchTitle, "Lyrics not available on Musixmatch.", "none", lyricUrl);
+                    }
+    
+                }
 
             } else {
 
@@ -488,21 +531,35 @@ function getMusixmatchLyrics(searchQuery, lyricUrl) {
 
                 lyrics = lyrics.replaceAll("\\n", "<br />").replaceAll("\\", "");
 
-                var coverUrl = body.substring(
+                var coverUrlUnicode = body.substring(
                     body.indexOf('"albumCoverart100x100":"') + 24,
                     body.indexOf('","albumCoverart350x350"')
                 )
-                coverUrl = JSON.parse('"' + coverUrl + '"').replace('"', "");
 
-                appLog('Cover URL: ' + coverUrl);
-                //appLog('Lyrics: ' + lyrics);
+                appLog("Unicode Cover URL: " + coverUrlUnicode)
 
-                if (!coverUrl.includes('nocover')) {
-                    setLyrics(musixmatchTitle, lyrics, coverUrl, lyricUrl)
-                } else {
-                    setLyrics(musixmatchTitle, lyrics, "none", lyricUrl)
+                var coverUrl = 'none'
+
+                try {
+                    coverUrl = JSON.parse('"' + coverUrlUnicode + '"').replace('"', "");
+                } catch (error) {
+                    appLog('Error: ' + error)
+                    setLyrics("", "Error. Please refresh.")
                 }
 
+                if (coverUrl != 'none'){
+                    appLog('Cover URL: ' + coverUrl);
+                    //appLog('Lyrics: ' + lyrics);
+                    //^ It's illegal to store scrapped information
+
+                    console.log('Lyrics: ' + lyrics)
+    
+                    if (!coverUrl.includes('nocover')) {
+                        setLyrics(musixmatchTitle, lyrics, coverUrl, lyricUrl)
+                    } else {
+                        setLyrics(musixmatchTitle, lyrics, "none", lyricUrl)
+                    }
+                }
 
             }
         });
