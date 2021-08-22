@@ -300,12 +300,16 @@ function searchMusixmatch(searchQuery, oldSearchQuery = "") {
 
                     var splitedQuery = searchQuery.split(' - ')
                     var originalArtists = splitedQuery[splitedQuery.length - 1]
-                    var firstArtist = originalArtists.substring(0, originalArtists.indexOf(', '))
+                    if (!originalArtists.includes(', ')){
+                        searchMusixmatch(searchQuery, searchQuery)
+                    } else {
+                        var firstArtist = originalArtists.substring(0, originalArtists.indexOf(', '))
 
-                    var newSearchQuery = searchQuery.replace(originalArtists, firstArtist)
-
-                    searchMusixmatch(newSearchQuery, searchQuery)
-
+                        var newSearchQuery = searchQuery.replace(originalArtists, firstArtist)
+    
+                        searchMusixmatch(newSearchQuery, searchQuery)
+                    }
+                    
 
                 } else if (!hasRetried2 && ((searchQuery.includes(' (') || oldSearchQuery.includes(' (')) || (searchQuery.includes(' [') || oldSearchQuery.includes(' [')))) {
 
