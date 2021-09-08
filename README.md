@@ -1,4 +1,4 @@
-# tidal-lyrics | The repository will be archived, read more [here](https://github.com/1nikolas/tidal-lyrics/issues/19)
+# tidal-lyrics | The repository is archived, read more [here](https://github.com/1nikolas/tidal-lyrics/issues/19)
 ![icon](https://user-images.githubusercontent.com/30593419/96611798-b6594500-1305-11eb-9d3a-fd7e32f3b7c8.png)
 
 Simple app to get the lyrics of what you're listening on Tidal. Built with Electron.
